@@ -1,6 +1,6 @@
 # xbook
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![FSL-1.1-MIT](https://img.shields.io/badge/license-FSL--1.1--MIT-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-469_passing-brightgreen.svg)]()
 [![Node 20+](https://img.shields.io/badge/node-20%2B-green.svg)]()
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)]()
@@ -180,4 +180,10 @@ Contributions are welcome! Please open an issue or pull request on GitHub.
 
 ## License
 
-MIT
+Licensed under [FSL-1.1-MIT](LICENSE) (Functional Source License, Version 1.1, MIT Future License).
+
+- Free to self-host, modify, and use for any non-competing purpose
+- Cannot be used to offer a competing commercial service
+- Automatically converts to MIT after 2 years per version
+
+See [fsl.software](https://fsl.software) for details.

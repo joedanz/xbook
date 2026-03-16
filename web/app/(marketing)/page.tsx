@@ -52,7 +52,7 @@ const features = [
   {
     icon: Code2,
     title: "Open Source",
-    description: "MIT licensed. Self-host for free.",
+    description: "Free to self-host. Fair Source licensed.",
   },
   {
     icon: Zap,
@@ -81,7 +81,7 @@ export default function LandingPage() {
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Sync, search, tag, and organize your X bookmarks. Get a newsletter
-            digest of your saved content. Self-host for free. MIT licensed.
+            digest of your saved content. Self-host for free. Fair Source licensed.
           </p>
           <div className="mt-8 flex items-center justify-center gap-4 flex-wrap">
             <Button size="lg" asChild>
@@ -181,7 +181,7 @@ export default function LandingPage() {
             <CardContent>
               <ul className="space-y-2 text-sm">
                 {[
-                  "MIT licensed",
+                  "Fair Source (FSL-1.1-MIT)",
                   "SQLite — zero dependencies",
                   "Docker one-liner",
                   "Full API access",
@@ -215,8 +215,8 @@ export default function LandingPage() {
           <Code2 className="h-10 w-10 mx-auto mb-4 text-primary" aria-hidden="true" />
           <h2 className="text-3xl font-bold">Built in the open</h2>
           <p className="mt-3 text-muted-foreground max-w-lg mx-auto">
-            xbook is MIT licensed and open source. Star us on GitHub, report
-            issues, or contribute code.
+            xbook is Fair Source and open code. Star us on GitHub, report
+            issues, or contribute.
           </p>
           <Button size="lg" variant="outline" className="mt-6" asChild>
             <a

@@ -14,6 +14,7 @@ All notable changes to xbook are documented in this file.
 - **Scheduled operation** — `xbook serve --cron` for hands-off sync and newsletter delivery
 - **Docker** deployment with SQLite persistence, health check, and `docker compose` support
 - **Cloud mode** — multi-tenant Postgres (Neon) deployment with Better Auth social sign-in, API keys, rate limiting, and sync locking
+- **FSL-1.1-MIT licensed** — Fair Source with automatic MIT conversion after 2 years
 - **Settings page** — X account connection status, newsletter email configuration (cloud), and API key management (cloud)
 
 ### Architecture

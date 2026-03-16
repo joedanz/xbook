@@ -38,12 +38,12 @@ export function MarketingFooter() {
           <div>
             <h3 className="font-medium text-sm mb-3">Legal</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><span>MIT License</span></li>
+              <li><span>FSL-1.1-MIT</span></li>
             </ul>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t flex items-center justify-between text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} xbook. Open source under MIT.</p>
+          <p>&copy; {new Date().getFullYear()} xbook. Fair Source — FSL-1.1-MIT.</p>
           <a
             href="https://github.com/joedanz/xbook"
             target="_blank"

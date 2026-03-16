@@ -2,7 +2,7 @@
   "name": "xbook",
   "version": "0.1.0",
   "description": "X Bookmarks organizer & weekly newsletter",
-  "license": "MIT",
+  "license": "FSL-1.1-MIT",
   "type": "module",
   "engines": {
     "node": ">=20"
