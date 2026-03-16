@@ -1,0 +1,41 @@
+# Secrets
+.env
+.env.local
+.env*.local
+.tokens.json
+web/.tokens.json
+
+# Version control
+.git/
+
+# Dependencies (installed fresh in Docker)
+node_modules/
+web/node_modules/
+
+# SQLite database files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Build artifacts
+.next/
+dist/
+
+# Test files
+tests/
+web/__tests__/
+
+# Documentation and task tracking
+docs/
+tasks/
+*.md
+
+# Screenshots and image artifacts
+*.png
+
+# IDE / tool config
+.DS_Store
+.claude/
+.osgrep/
+.playwright-mcp/

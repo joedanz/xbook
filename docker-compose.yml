@@ -1,0 +1,33 @@
+services:
+  xbook:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - xbook-data:/data
+    env_file:
+      - .env
+    environment:
+      - DB_PATH=/data/xbook.db
+      - NODE_ENV=production
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+    networks:
+      - xbook-net
+
+volumes:
+  xbook-data:
+
+networks:
+  xbook-net:
+    driver: bridge
