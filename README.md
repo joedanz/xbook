@@ -7,8 +7,7 @@
 
 Sync your X bookmarks, search and organize them, and get a weekly email digest with what you saved.
 
-<!-- TODO: Add dashboard screenshot here -->
-<!-- ![xbook dashboard](docs/images/dashboard.png) -->
+![xbook dashboard](docs/images/dashboard.png)
 
 ---
 
@@ -129,15 +128,10 @@ All commands support `--json` for machine-readable output and `--api-url` to ove
 
 ## Screenshots
 
-<!-- TODO: Add screenshots after capturing -->
-<!-- ![Dashboard](docs/images/dashboard.png) -->
-<!-- ![Search](docs/images/search.png) -->
-<!-- ![Newsletter](docs/images/newsletter.png) -->
+![Bookmarks](docs/images/search.png)
+![Newsletter](docs/images/newsletter.png)
 
 ## Web Interface
-
-<!-- TODO: Add web UI screenshot here -->
-<!-- ![xbook web interface](docs/images/web-ui.png) -->
 
 Start the dev server and open [http://localhost:3000/dashboard](http://localhost:3000/dashboard):
 
