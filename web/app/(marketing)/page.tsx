@@ -81,7 +81,7 @@ export default function LandingPage() {
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Sync, search, tag, and organize your X bookmarks. Get a newsletter
-            digest of your saved content. Self-host for free. Fair Source licensed.
+            digest of your saved content. Your data, your machine.
           </p>
           <div className="mt-8 flex items-center justify-center gap-4 flex-wrap">
             <Button size="lg" asChild>
@@ -96,7 +96,7 @@ export default function LandingPage() {
                 rel="noopener noreferrer"
               >
                 <GitHubIcon className="mr-2 h-4 w-4" />
-                Self-Host
+                GitHub
               </a>
             </Button>
           </div>
