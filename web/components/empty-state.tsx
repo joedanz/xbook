@@ -8,14 +8,20 @@ import { SyncProgressModal } from "@/components/sync-progress-modal";
 
 export function EmptyState() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [expired, setExpired] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetch("/api/connect-x/status")
       .then((r) => r.json())
-      .then((d) => setAuthenticated(d.authenticated))
+      .then((d) => {
+        setAuthenticated(d.authenticated);
+        setExpired(!!d.expired);
+      })
       .catch(() => {/* leave as null — loading state is safer than wrong state */});
   }, []);
+
+  const needsReconnect = authenticated && expired;
 
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
@@ -25,6 +31,13 @@ export function EmptyState() {
           <h2 className="text-xl font-semibold">No bookmarks yet</h2>
           {authenticated === null ? (
             <p className="text-muted-foreground text-sm">Loading...</p>
+          ) : needsReconnect ? (
+            <>
+              <p className="text-muted-foreground text-sm">
+                Your X session has expired. Re-connect your account to sync bookmarks.
+              </p>
+              <ConnectButton />
+            </>
           ) : authenticated ? (
             <>
               <p className="text-muted-foreground text-sm">

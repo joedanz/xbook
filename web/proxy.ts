@@ -5,8 +5,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const csp = [
+  const isDev = process.env.NODE_ENV === "development";
+
+  // Skip CSP entirely in dev — Turbopack needs eval/inline scripts
+  const nonce = isDev ? "" : Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = isDev ? "" : [
     `default-src 'self'`,
     `script-src 'self' 'nonce-${nonce}'`,
     `style-src 'self' 'unsafe-inline'`,
@@ -17,9 +20,9 @@ export function proxy(request: NextRequest) {
   ].join("; ");
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", nonce);
+  if (nonce) requestHeaders.set("x-nonce", nonce);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
-  response.headers.set("Content-Security-Policy", csp);
+  if (csp) response.headers.set("Content-Security-Policy", csp);
   return response;
 }
 
