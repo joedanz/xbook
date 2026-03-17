@@ -7,7 +7,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -85,28 +84,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Bookmarks by folder */}
-      {stats.bookmarksByFolder.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>By Folder</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {stats.bookmarksByFolder.map((f) => (
-                <div
-                  key={f.folder}
-                  className="flex items-center justify-between"
-                >
-                  <span className="text-sm">{f.folder}</span>
-                  <Badge variant="secondary">{f.count}</Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <Separator />
 
