@@ -35,7 +35,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-  delete process.env.NODE_ENV;
+  process.env.NODE_ENV = "test";
 });
 
 async function loadProxy() {

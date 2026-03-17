@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "X Bookmarks organizer & weekly newsletter",
   "license": "FSL-1.1-MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joedanz/xbook.git"
+  },
+  "homepage": "https://github.com/joedanz/xbook",
+  "bugs": "https://github.com/joedanz/xbook/issues",
   "type": "module",
   "engines": {
     "node": ">=20"
