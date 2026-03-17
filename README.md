@@ -77,7 +77,7 @@ Your data is safe in the `xbook-data` Docker volume across upgrades.
 git clone https://github.com/joedanz/xbook.git && cd xbook
 npm install
 cd web && npm install && cd ..
-cp .env.local.example .env.local
+cp .env.example .env.local
 # Edit .env.local with your credentials
 ```
 

@@ -26,7 +26,7 @@ cd web && npm install && cd ..
 3. Copy the environment template and fill in your credentials:
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env.local
 ```
 
 4. Start the web dev server:
