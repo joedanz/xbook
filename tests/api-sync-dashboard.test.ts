@@ -2,7 +2,7 @@
 // ABOUTME: Covers local mode token loading, sync lock, rate limiting, and error handling.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // Mock rate-limit module
 vi.mock("@/lib/rate-limit", () => ({
@@ -73,8 +73,8 @@ function restoreEnv() {
   }
 }
 
-function makeRequest(): Request {
-  return new Request("http://localhost:3000/api/sync", { method: "POST" });
+function makeRequest(): NextRequest {
+  return new NextRequest("http://localhost:3000/api/sync", { method: "POST" });
 }
 
 function validTokens() {
@@ -108,7 +108,7 @@ describe("POST /api/sync (dashboard)", () => {
   it("returns 401 when .tokens.json is missing (local mode)", async () => {
     // existsSync returns false by default — no token file found
 
-    const res = await POST();
+    const res = await POST(makeRequest());
     expect(res.status).toBe(401);
     const json = await res.json();
     expect(json.success).toBe(false);
@@ -116,7 +116,7 @@ describe("POST /api/sync (dashboard)", () => {
   });
 
   it("releases lock when .tokens.json is missing", async () => {
-    await POST();
+    await POST(makeRequest());
     expect(mockReleaseSyncLock).toHaveBeenCalledWith("local");
   });
 
@@ -129,7 +129,7 @@ describe("POST /api/sync (dashboard)", () => {
       resetAt: Date.now() + 60000,
     });
 
-    const res = await POST();
+    const res = await POST(makeRequest());
     expect(res.status).toBe(429);
     const json = await res.json();
     expect(json.error).toBe("Too many requests");
@@ -142,7 +142,7 @@ describe("POST /api/sync (dashboard)", () => {
       resetAt: Date.now() + 60000,
     });
 
-    await POST();
+    await POST(makeRequest());
     expect(mockAcquireSyncLock).not.toHaveBeenCalled();
   });
 
@@ -151,7 +151,7 @@ describe("POST /api/sync (dashboard)", () => {
   it("returns 409 when sync lock cannot be acquired", async () => {
     mockAcquireSyncLock.mockResolvedValueOnce(false);
 
-    const res = await POST();
+    const res = await POST(makeRequest());
     expect(res.status).toBe(409);
     const json = await res.json();
     expect(json.success).toBe(false);
@@ -161,7 +161,7 @@ describe("POST /api/sync (dashboard)", () => {
   it("does not release lock when lock was never acquired", async () => {
     mockAcquireSyncLock.mockResolvedValueOnce(false);
 
-    await POST();
+    await POST(makeRequest());
     expect(mockReleaseSyncLock).not.toHaveBeenCalled();
   });
 
@@ -170,7 +170,7 @@ describe("POST /api/sync (dashboard)", () => {
   it("returns 500 when X_CLIENT_ID is missing", async () => {
     delete process.env.X_CLIENT_ID;
 
-    const res = await POST();
+    const res = await POST(makeRequest());
     expect(res.status).toBe(500);
     const json = await res.json();
     expect(json.success).toBe(false);
@@ -180,7 +180,7 @@ describe("POST /api/sync (dashboard)", () => {
   it("releases lock when credentials are missing", async () => {
     delete process.env.X_CLIENT_ID;
 
-    await POST();
+    await POST(makeRequest());
     expect(mockReleaseSyncLock).toHaveBeenCalledWith("local");
   });
 
@@ -193,7 +193,7 @@ describe("POST /api/sync (dashboard)", () => {
 
     mockSyncBookmarks.mockResolvedValueOnce({ fetched: 42, newCount: 7, pages: 2 });
 
-    const res = await POST();
+    const res = await POST(makeRequest());
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.success).toBe(true);
@@ -210,7 +210,7 @@ describe("POST /api/sync (dashboard)", () => {
     vi.mocked(fs.readFileSync).mockReturnValueOnce(validTokens());
     mockSyncBookmarks.mockResolvedValueOnce({ fetched: 10, newCount: 2, pages: 1 });
 
-    await POST();
+    await POST(makeRequest());
     expect(mockReleaseSyncLock).toHaveBeenCalledWith("local");
   });
 
@@ -223,7 +223,7 @@ describe("POST /api/sync (dashboard)", () => {
 
     mockSyncBookmarks.mockRejectedValueOnce(new Error("X API down"));
 
-    const res = await POST();
+    const res = await POST(makeRequest());
     expect(res.status).toBe(500);
     const json = await res.json();
     expect(json.success).toBe(false);
@@ -237,7 +237,7 @@ describe("POST /api/sync (dashboard)", () => {
 
     mockSyncBookmarks.mockRejectedValueOnce(new Error("Network error"));
 
-    await POST();
+    await POST(makeRequest());
     expect(mockReleaseSyncLock).toHaveBeenCalledWith("local");
   });
 
@@ -262,7 +262,7 @@ describe("POST /api/sync (dashboard)", () => {
     });
     mockSyncBookmarks.mockResolvedValueOnce({ fetched: 5, newCount: 1, pages: 1 });
 
-    const res = await POST();
+    const res = await POST(makeRequest());
     expect(res.status).toBe(200);
     expect(mockRefreshXTokenForWeb).toHaveBeenCalledWith(
       "old-refresh",

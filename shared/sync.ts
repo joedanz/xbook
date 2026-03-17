@@ -12,8 +12,14 @@ const MAX_PAGES = 200;
 
 export async function syncBookmarks(
   repo: BookmarkRepository,
-  accessToken: string
+  accessToken: string,
+  onProgress?: (message: string) => void
 ): Promise<SyncResult> {
+  function log(msg: string) {
+    console.log(msg);
+    onProgress?.(msg);
+  }
+
   // Get or cache user ID
   let userId = await repo.getUserInfo("user_id");
   if (!userId) {
@@ -41,7 +47,7 @@ export async function syncBookmarks(
     const logMsg =
       `Page ${page}: ${response.tweets.length} tweets` +
       (response.nextToken ? `, next_token: ${response.nextToken.slice(0, 20)}...` : ", no next_token (last page)");
-    console.log(`Bookmark ${logMsg}`);
+    log(`Bookmark ${logMsg}`);
     paginationLog.push(logMsg);
     // Deduplicate within this page against previously seen tweets
     const uniqueTweets = response.tweets.filter(tweet => {
@@ -57,7 +63,7 @@ export async function syncBookmarks(
     }
     nextToken = response.nextToken;
   } while (nextToken);
-  console.log(`Bookmark sync complete: ${fetched} total across ${page} page(s)`);
+  log(`Bookmark sync complete: ${fetched} total across ${page} page(s)`);
 
   // Fetch folders and assign bookmarks to them.
   // The folder bookmarks endpoint only returns tweet IDs (no expansions),
@@ -76,7 +82,7 @@ export async function syncBookmarks(
     for (const folder of folderResponse.folders) {
       foldersFound++;
       await repo.upsertFolder(folder);
-      console.log(`Syncing folder "${folder.name}" (${folder.id})...`);
+      log(`Syncing folder "${folder.name}" (${folder.id})...`);
 
       let folderBookmarkToken: string | undefined;
       let folderBookmarkPage = 0;
@@ -92,7 +98,7 @@ export async function syncBookmarks(
           folder.id,
           folderBookmarkToken
         );
-        console.log(`  → Got ${folderBookmarks.tweetIds.length} bookmark IDs`);
+        log(`  → Got ${folderBookmarks.tweetIds.length} bookmark IDs`);
         if (folderBookmarks.tweetIds.length > 0) {
           await repo.assignBookmarkFolderBatch(folderBookmarks.tweetIds, folder.id, folder.name);
           folderAssignments += folderBookmarks.tweetIds.length;
@@ -107,7 +113,7 @@ export async function syncBookmarks(
   let articlesEnriched = 0;
   const articlesNeedingMetadata = await repo.getArticleBookmarksMissingMetadata();
   if (articlesNeedingMetadata.length > 0) {
-    console.log(`Fetching metadata for ${articlesNeedingMetadata.length} article bookmarks...`);
+    log(`Fetching metadata for ${articlesNeedingMetadata.length} article bookmarks...`);
     for (const { tweet_id } of articlesNeedingMetadata) {
       const metadata = await fetchArticleMetadata(tweet_id);
       if (metadata.imageUrl || metadata.previewText) {
@@ -115,7 +121,7 @@ export async function syncBookmarks(
         articlesEnriched++;
       }
     }
-    console.log(`  → Enriched ${articlesEnriched} articles`);
+    log(`  → Enriched ${articlesEnriched} articles`);
   }
 
   await repo.logSync(fetched, newCount);

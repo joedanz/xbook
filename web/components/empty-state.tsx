@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConnectButton } from "@/components/connect-button";
 import { Button } from "@/components/ui/button";
+import { SyncProgressModal } from "@/components/sync-progress-modal";
 
 export function EmptyState() {
-  const router = useRouter();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const [syncing, setSyncing] = useState(false);
-  const [syncError, setSyncError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetch("/api/connect-x/status")
@@ -18,24 +16,6 @@ export function EmptyState() {
       .then((d) => setAuthenticated(d.authenticated))
       .catch(() => {/* leave as null — loading state is safer than wrong state */});
   }, []);
-
-  async function handleSync() {
-    setSyncing(true);
-    setSyncError(null);
-    try {
-      const res = await fetch("/api/sync", { method: "POST" });
-      const data = await res.json();
-      if (data.success) {
-        router.refresh();
-      } else {
-        setSyncError(data.message || "Sync failed");
-      }
-    } catch {
-      setSyncError("Sync request failed");
-    } finally {
-      setSyncing(false);
-    }
-  }
 
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
@@ -53,14 +33,11 @@ export function EmptyState() {
               <Button
                 size="lg"
                 className="w-full"
-                onClick={handleSync}
-                disabled={syncing}
+                onClick={() => setShowModal(true)}
+                disabled={showModal}
               >
-                {syncing ? "Syncing..." : "Sync Now"}
+                {showModal ? "Syncing..." : "Sync Now"}
               </Button>
-              {syncError && (
-                <p className="text-destructive text-sm">{syncError}</p>
-              )}
             </>
           ) : (
             <>
@@ -85,6 +62,7 @@ export function EmptyState() {
           )}
         </CardContent>
       </Card>
+      <SyncProgressModal open={showModal} onOpenChange={setShowModal} />
     </div>
   );
 }
