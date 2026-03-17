@@ -1,4 +1,9 @@
+import { resolve } from "node:path";
+import { config } from "dotenv";
 import type { NextConfig } from "next";
+
+// Load .env.local from project root so users only need one env file
+config({ path: resolve(process.cwd(), "..", ".env.local") });
 
 const nextConfig: NextConfig = {
   images: {

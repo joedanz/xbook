@@ -29,6 +29,8 @@ export async function GET(request: Request) {
     );
   }
 
+  // Local mode: no authentication required to start OAuth
+
   const codeVerifier = base64url(randomBytes(32));
   const codeChallenge = base64url(
     createHash("sha256").update(codeVerifier).digest()

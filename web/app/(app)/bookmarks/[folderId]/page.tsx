@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { userId } = await requireUser();
   const { folderId } = await params;
-  const repo = getRepository();
+  const repo = getRepository(userId);
   const folders = await repo.getFolders();
   const folder = folders.find((f) => f.id === folderId);
   return {
@@ -32,7 +32,7 @@ export default async function FolderPage({ params, searchParams }: PageProps) {
   const { userId } = await requireUser();
   const { folderId } = await params;
   const sp = await searchParams;
-  const repo = getRepository();
+  const repo = getRepository(userId);
 
   // Find folder name
   const folders = await repo.getFolders();

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  // Check for .tokens.json on disk
+  // Local mode: check for .tokens.json on disk
   const candidates = [
     process.env.TOKEN_FILE_PATH,
     resolve(process.cwd(), ".tokens.json"),

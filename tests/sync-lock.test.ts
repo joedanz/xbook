@@ -4,6 +4,19 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { acquireSyncLock, releaseSyncLock } from "../web/lib/sync-lock";
 
+// Ensure local mode (no DATABASE_URL) so the in-memory backend is used.
+let savedDbUrl: string | undefined;
+
+beforeEach(() => {
+  savedDbUrl = process.env.DATABASE_URL;
+  delete process.env.DATABASE_URL;
+});
+
+afterEach(() => {
+  if (savedDbUrl !== undefined) {
+    process.env.DATABASE_URL = savedDbUrl;
+  }
+});
 
 describe("acquireSyncLock / releaseSyncLock (local mode)", () => {
   // Use unique user IDs per test to avoid cross-test pollution

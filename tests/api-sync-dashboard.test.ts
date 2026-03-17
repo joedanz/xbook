@@ -87,7 +87,8 @@ function validTokens() {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  saveEnv("X_CLIENT_ID", "X_CLIENT_SECRET", "TOKEN_FILE_PATH");
+  saveEnv("DATABASE_URL", "X_CLIENT_ID", "X_CLIENT_SECRET", "TOKEN_FILE_PATH");
+  delete process.env.DATABASE_URL;
   process.env.X_CLIENT_ID = "test-client-id";
   process.env.X_CLIENT_SECRET = "test-client-secret";
   delete process.env.TOKEN_FILE_PATH;

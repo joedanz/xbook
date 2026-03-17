@@ -30,7 +30,7 @@ export async function POST() {
       {
         success: false,
         message:
-          "X API credentials not configured. Add X_CLIENT_ID and X_CLIENT_SECRET to web/.env.local",
+          "X API credentials not configured. Add X_CLIENT_ID and X_CLIENT_SECRET to .env.local",
       },
       { status: 500 }
     );

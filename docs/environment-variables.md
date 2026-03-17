@@ -2,8 +2,6 @@
 
 Complete reference for all xbook environment variables.
 
-xbook runs in local mode: single-user, self-hosted, backed by SQLite.
-
 ## X API Credentials
 
 | Variable | Required | Default | Description |
@@ -37,6 +35,7 @@ xbook runs in local mode: single-user, self-hosted, backed by SQLite.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
+| `XBOOK_API_KEY` | No | -- | API key for authenticating CLI requests. Alternative to `xbook login`. |
 | `XBOOK_API_URL` | No | `http://localhost:3000` | Base URL of the xbook API server. |
 | `XBOOK_OUTPUT` | No | -- | Set to `json` for machine-readable CLI output. Same as `--json` flag. |
 

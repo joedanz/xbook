@@ -45,9 +45,9 @@ xbook needs X (Twitter) API credentials to sync your bookmarks. This guide walks
 
 ## 5. Configure xbook
 
-### CLI (self-hosted)
+### CLI
 
-Add to your `.env` file in the project root:
+Add to your `.env.local` file in the project root:
 
 ```bash
 X_CLIENT_ID=your_client_id_here
@@ -60,9 +60,9 @@ Then run:
 xbook login
 ```
 
-### Web (self-hosted)
+### Web
 
-Add to `web/.env.local`:
+Add to `.env.local` in the project root:
 
 ```bash
 X_CLIENT_ID=your_client_id_here

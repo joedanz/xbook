@@ -20,7 +20,7 @@ interface PageProps {
 export default async function BookmarksPage({ searchParams }: PageProps) {
   const { userId } = await requireUser();
   const params = await searchParams;
-  const repo = getRepository();
+  const repo = getRepository(userId);
   const filter = typeof params.filter === "string" ? params.filter : undefined;
 
   const query: BookmarkQuery = {

@@ -120,7 +120,7 @@ export async function POST(request: Request) {
     }
 
     // Import into database
-    const repo = getRepository();
+    const repo = getRepository(auth.userId);
     let imported = 0;
     let skipped = 0;
     let errors = 0;

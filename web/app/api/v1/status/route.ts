@@ -30,6 +30,7 @@ export async function GET(request: Request) {
 
   try {
     const database = await checkDatabase();
+
     const isHealthy = database.status === "ok";
 
     return NextResponse.json(

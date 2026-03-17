@@ -1,5 +1,5 @@
-// ABOUTME: Tests for the connect-x OAuth initiation route handler.
-// ABOUTME: Covers PKCE challenge generation, cookie storage, rate limiting, and cloud mode auth requirement.
+// ABOUTME: Tests for the connect-x OAuth initiation route handler (OSS overlay).
+// ABOUTME: Covers PKCE challenge generation, cookie storage, and rate limiting.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
@@ -8,7 +8,6 @@ vi.mock("@/lib/rate-limit", () => ({
   checkRateLimit: vi.fn(),
   getClientIp: vi.fn(() => "127.0.0.1"),
 }));
-
 
 import { GET } from "../web/app/api/connect-x/route";
 import { checkRateLimit } from "../web/lib/rate-limit";
@@ -94,5 +93,4 @@ describe("connect-x initiation", () => {
       url2.searchParams.get("state")
     );
   });
-
 });

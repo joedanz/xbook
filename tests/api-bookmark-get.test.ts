@@ -35,11 +35,20 @@ import { authenticateApiRequest } from "../web/lib/api-auth";
 const mockedCheckRateLimit = vi.mocked(checkRateLimit);
 const mockedAuth = vi.mocked(authenticateApiRequest);
 
+let savedDbUrl: string | undefined;
+
 beforeEach(() => {
   vi.clearAllMocks();
+  savedDbUrl = process.env.DATABASE_URL;
+  delete process.env.DATABASE_URL;
   // Default: pass rate limit and auth
   mockedCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 99, resetAt: 0 });
   mockedAuth.mockResolvedValue({ userId: "local" });
+});
+
+afterEach(() => {
+  if (savedDbUrl !== undefined) process.env.DATABASE_URL = savedDbUrl;
+  else delete process.env.DATABASE_URL;
 });
 
 function getRequest(): Request {

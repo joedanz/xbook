@@ -17,7 +17,7 @@ export const metadata = { title: "Newsletter", robots: { index: false } };
 
 export default async function NewsletterPage() {
   const { userId } = await requireUser();
-  const repo = getRepository();
+  const repo = getRepository(userId);
   const stats = await repo.getStats();
   const history = await repo.getNewsletterHistory(10);
   const pendingBookmarks = await repo.getNewBookmarks();

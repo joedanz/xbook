@@ -1,4 +1,4 @@
-// ABOUTME: Tests for the v1 newsletter POST route handler.
+// ABOUTME: Tests for the v1 newsletter POST route handler (OSS overlay).
 // ABOUTME: Covers rate limiting, auth, dry run, send flow, and error handling.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -32,7 +32,7 @@ vi.mock("@/lib/db", () => ({
   })),
 }));
 
-// Mock newsletter renderer (resolved path from test: ../shared/newsletter)
+// Mock newsletter renderer
 vi.mock("@shared/newsletter", () => ({
   renderNewsletter: vi.fn(() => ({
     subject: "Your X Bookmarks — March 6, 2026",
@@ -40,7 +40,7 @@ vi.mock("@shared/newsletter", () => ({
   })),
 }));
 
-// Mock email sender (resolved path from test: ../shared/email)
+// Mock email sender
 const mockSendEmail = vi.fn();
 vi.mock("@shared/email", () => ({
   sendEmail: (...args: unknown[]) => mockSendEmail(...args),

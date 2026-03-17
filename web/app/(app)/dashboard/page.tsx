@@ -21,7 +21,7 @@ export const metadata = { title: "Dashboard", robots: { index: false } };
 
 export default async function DashboardPage() {
   const { userId } = await requireUser();
-  const repo = getRepository();
+  const repo = getRepository(userId);
   const stats = await repo.getStats();
   const recentBookmarks = await repo.queryBookmarks({
     page: 1,

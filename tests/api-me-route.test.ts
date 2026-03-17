@@ -1,7 +1,7 @@
-// ABOUTME: Tests for the v1 me GET route handler.
-// ABOUTME: Covers rate limiting, auth, local mode stub, and error handling.
+// ABOUTME: Tests for the v1 me GET route handler (OSS overlay).
+// ABOUTME: Covers rate limiting, auth, and local mode stub profile.
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextResponse } from "next/server";
 
 // Mock rate-limit module
@@ -18,9 +18,6 @@ vi.mock("@/lib/rate-limit", () => ({
 vi.mock("@/lib/api-auth", () => ({
   authenticateApiRequest: vi.fn(),
 }));
-
-// Mock db module
-vi.mock("@/lib/db", () => ({}));
 
 import { GET } from "../web/app/api/v1/me/route";
 import { checkRateLimit } from "../web/lib/rate-limit";
@@ -61,7 +58,7 @@ describe("GET /api/v1/me", () => {
     expect(json.error).toBe("Invalid API key");
   });
 
-  it("returns local stub profile", async () => {
+  it("returns local stub profile when DATABASE_URL is not set", async () => {
     mockedCheckRateLimit.mockResolvedValueOnce({ allowed: true, remaining: 99, resetAt: 0 });
     mockedAuth.mockResolvedValueOnce({ userId: "local" });
 

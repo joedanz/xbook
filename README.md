@@ -79,7 +79,6 @@ npm install
 cd web && npm install && cd ..
 cp .env.local.example .env.local
 # Edit .env.local with your credentials
-cp .env.local web/.env.local
 ```
 
 | Variable | Required | Description |

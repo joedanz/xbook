@@ -41,7 +41,7 @@ export async function GET(
     if (id.length > MAX_ID_LEN) {
       return NextResponse.json({ error: "Invalid bookmark ID" }, { status: 400 });
     }
-    const repo = getRepository();
+    const repo = getRepository(auth.userId);
     const bookmark = await repo.getBookmarkById(id);
 
     if (!bookmark) {
@@ -144,7 +144,7 @@ export async function PATCH(
       return NextResponse.json({ error: `folder_name must be at most ${MAX_FOLDER_NAME_LEN} characters` }, { status: 400 });
     }
 
-    const repo = getRepository();
+    const repo = getRepository(auth.userId);
 
     const existing = await repo.getBookmarkById(id);
     if (!existing) {
@@ -229,7 +229,7 @@ export async function DELETE(
     if (id.length > MAX_ID_LEN) {
       return NextResponse.json({ error: "Invalid bookmark ID" }, { status: 400 });
     }
-    const repo = getRepository();
+    const repo = getRepository(auth.userId);
 
     const existing = await repo.getBookmarkById(id);
     if (!existing) {

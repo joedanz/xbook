@@ -10,5 +10,6 @@ dist/
 .osgrep/
 .next/
 .DS_Store
-.claude/
+.claude/worktrees/
 .playwright-mcp/
+*.png

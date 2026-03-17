@@ -17,10 +17,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  try {
-    return NextResponse.json({ userId: "local", name: "Local User", mode: "local" });
-  } catch (error) {
-    console.error("GET /api/v1/me error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
+  return NextResponse.json({ userId: "local", name: "Local User", mode: "local" });
 }

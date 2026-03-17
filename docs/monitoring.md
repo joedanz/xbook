@@ -45,14 +45,14 @@ docker inspect --format='{{.State.Health.Status}}' xbook
 
 ## Logging
 
-xbook logs to stdout/stderr (standard for Docker).
+xbook logs to stdout/stderr (standard for Docker deployments).
 
 ### What's logged
 
 | Event | Level | Example |
 |-------|-------|---------|
-| Sync completed | info | `Cron sync complete: 3 synced, 0 failed` |
-| Sync failure | error | `Sync failed for user abc123...: Token expired` |
+| Sync completed | info | `Sync complete: fetched 50, new 3` |
+| Sync failure | error | `Sync failed: Token expired` |
 | API errors | error | `POST /api/v1/sync error: <details>` |
 | Newsletter send failure | error | `POST /api/v1/newsletter error: <details>` |
 | Database health check failure | error | `Database health check failed: <details>` |

@@ -28,7 +28,6 @@ All endpoints return errors in this format:
 | Status | Meaning |
 |--------|---------|
 | 400 | Bad request (invalid parameters or body) |
-| 401 | Not authenticated (X account not connected) |
 | 404 | Resource not found |
 | 429 | Rate limit exceeded (check `Retry-After` header) |
 | 500 | Server error |
@@ -39,7 +38,7 @@ All endpoints return errors in this format:
 
 ### GET /api/v1/status
 
-Health check. Returns server status and mode.
+Health check. Returns server status.
 
 **Authentication:** None required.
 
@@ -58,7 +57,7 @@ Health check. Returns server status and mode.
 | Field | Type | Description |
 |-------|------|-------------|
 | `status` | string | `"ok"` or `"degraded"` (returns 503 when degraded) |
-| `mode` | string | `"local"` |
+| `mode` | string | `"local"` (SQLite) |
 | `version` | string | Server version |
 | `timestamp` | string | Current server time (ISO 8601) |
 | `database` | string | `"ok"` or `"error"` |
@@ -68,7 +67,7 @@ Health check. Returns server status and mode.
 
 ### GET /api/v1/me
 
-Returns the local user's profile.
+Returns the local user's profile. Used by `xbook login` to validate connections.
 
 **Response:**
 
@@ -246,8 +245,8 @@ Trigger a bookmark sync from X. Requires X OAuth tokens to be configured.
 ```
 
 **Errors:**
-- `401` — Not authenticated (X account not connected)
-- `409` — Sync already in progress (another sync is running for this user)
+- `401` -- Not authenticated (X account not connected)
+- `409` -- Sync already in progress
 
 ---
 
@@ -299,8 +298,8 @@ Send or preview the weekly bookmark newsletter digest.
 ```
 
 **Errors:**
-- `400` — No newsletter email configured
-- `500` — `RESEND_API_KEY` not set
+- `400` -- No newsletter email configured
+- `500` -- `RESEND_API_KEY` not set
 
 ---
 
@@ -310,9 +309,9 @@ Import bookmarks from a JSON or CSV file.
 
 Accepts three input formats:
 
-1. **Multipart file upload** (`Content-Type: multipart/form-data`) — file field named `file`
-2. **Raw content** (`Content-Type: application/json`) — `{ "content": "...", "filename": "bookmarks.json" }`
-3. **Pre-parsed data** (`Content-Type: application/json`) — `{ "tweets": [...], "users": {...} }`
+1. **Multipart file upload** (`Content-Type: multipart/form-data`) -- file field named `file`
+2. **Raw content** (`Content-Type: application/json`) -- `{ "content": "...", "filename": "bookmarks.json" }`
+3. **Pre-parsed data** (`Content-Type: application/json`) -- `{ "tweets": [...], "users": {...} }`
 
 **File size limit:** 10 MB.
 

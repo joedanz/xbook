@@ -13,29 +13,22 @@ All notable changes to xbook are documented in this file.
 - **CLI** — `xbook sync`, `xbook import`, `xbook newsletter`, `xbook serve` (cron), `xbook login`, and more
 - **Scheduled operation** — `xbook serve --cron` for hands-off sync and newsletter delivery
 - **Docker** deployment with SQLite persistence, health check, and `docker compose` support
-- **Cloud mode** — multi-tenant Postgres (Neon) deployment with Better Auth social sign-in, API keys, rate limiting, and sync locking
-- **FSL-1.1-MIT licensed** — Fair Source with automatic MIT conversion after 2 years
-- **Settings page** — X account connection status, newsletter email configuration (cloud), and API key management (cloud)
+- **Settings page** — X account connection status and newsletter email configuration
 
 ### Architecture
 
-- Dual-mode: **local** (SQLite, single-user) and **cloud** (Postgres, multi-user via Better Auth)
-- AES-256-GCM encryption for OAuth tokens at rest (cloud mode)
+- SQLite with WAL mode and busy timeout for concurrency
+- AES-256-GCM encryption for OAuth tokens at rest
 - Rate limit handling with exponential backoff for X API and token refresh
-- WAL mode and busy timeout for SQLite concurrency
 - Article metadata enrichment via Twitter syndication API
-- Repository pattern with shared interface for SQLite and Drizzle/Postgres backends
-- Dual-backend rate limiting (in-memory + Postgres atomic upsert)
-- Dual-backend sync locking with TTL (in-memory + Postgres row-level)
+- Repository pattern with shared interface for database backends
 
 ### Security
 
-- Timing-safe CRON_SECRET comparison to prevent timing attacks
 - Sanitized error responses — database internals are never leaked to clients
 - PKCE OAuth flow with state validation and encrypted token storage
 - Security headers (CSP, X-Frame-Options, HSTS, X-Content-Type-Options)
 - Non-root Docker user with read-only filesystem recommendations
-- API key authentication with SHA-256 hashing for cloud mode
 
 ### API
 
@@ -57,5 +50,4 @@ All notable changes to xbook are documented in this file.
 
 - README with Docker quickstart, CLI usage, and self-hosting guide
 - API reference with all endpoints, parameters, and response formats
-- Cloud deployment guide for Vercel + Neon
-- Environment variable reference for both modes
+- Environment variable reference

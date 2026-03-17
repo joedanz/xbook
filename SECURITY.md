@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in xbook, please report it responsibly.
 
-**Email:** security@xbook.sh
+**GitHub:** Open a [security advisory](https://github.com/joedanz/xbook/security/advisories/new)
 
 Please include:
 - Description of the vulnerability
@@ -23,7 +23,6 @@ We will acknowledge receipt within 48 hours and aim to release a fix within 7 da
 ## Scope
 
 - xbook application code (this repository)
-- xbook Cloud (xbook.sh)
 - API endpoints
 - Authentication flows
 - Data storage and encryption

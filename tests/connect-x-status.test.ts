@@ -1,7 +1,7 @@
-// ABOUTME: Tests for the connect-x/status GET route handler.
-// ABOUTME: Covers rate limiting and local mode file check.
+// ABOUTME: Tests for the connect-x/status GET route handler (OSS overlay).
+// ABOUTME: Covers rate limiting and local mode file-based token check.
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock rate-limit module
 vi.mock("@/lib/rate-limit", () => ({
@@ -17,7 +17,6 @@ vi.mock("fs", async () => {
     existsSync: vi.fn(() => false),
   };
 });
-
 
 import { GET } from "../web/app/api/connect-x/status/route";
 import { checkRateLimit } from "../web/lib/rate-limit";
@@ -65,5 +64,4 @@ describe("GET /api/connect-x/status", () => {
     const json = await res.json();
     expect(json.authenticated).toBe(true);
   });
-
 });

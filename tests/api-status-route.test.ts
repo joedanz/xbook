@@ -1,7 +1,7 @@
-// ABOUTME: Tests for the v1 status (health check) GET route handler.
-// ABOUTME: Covers rate limiting, local/cloud mode detection, and DB health check.
+// ABOUTME: Tests for the v1 status (health check) GET route handler (OSS overlay).
+// ABOUTME: Covers rate limiting, local SQLite health check, and response fields.
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextResponse } from "next/server";
 
 // Mock rate-limit module
@@ -12,9 +12,6 @@ vi.mock("@/lib/rate-limit", () => ({
   ),
   getClientIp: vi.fn(() => "127.0.0.1"),
 }));
-
-// Mock db module
-vi.mock("@/lib/db", () => ({}));
 
 import { GET } from "../web/app/api/v1/status/route";
 import { checkRateLimit } from "../web/lib/rate-limit";

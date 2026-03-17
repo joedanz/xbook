@@ -73,7 +73,7 @@ The token refresh function retries up to 3 times with exponential backoff (1s, 2
    RESEND_API_KEY=re_xxxxx
    ```
 
-2. **`NEWSLETTER_TO` not set.** In local mode, xbook needs a recipient email address:
+2. **`NEWSLETTER_TO` not set.** xbook needs a recipient email address:
 
    ```bash
    NEWSLETTER_TO=you@example.com
@@ -94,9 +94,15 @@ The token refresh function retries up to 3 times with exponential backoff (1s, 2
 
 ---
 
-## `ENCRYPTION_KEY` (Optional)
+## `ENCRYPTION_KEY` Not Set
 
-`ENCRYPTION_KEY` is optional in local mode. If not set, OAuth tokens are stored as plaintext. If you want encryption at rest, generate a key:
+**Symptom:** Tokens are stored as plaintext in the database.
+
+**What happens:** The `ENCRYPTION_KEY` is optional. If not set, `encryptIfAvailable()` and `decryptIfAvailable()` pass data through unchanged and tokens are stored as plaintext in the `.tokens.json` file or SQLite database. This is fine for local/self-hosted deployments where the database is not exposed.
+
+**To enable encryption (optional):**
+
+Generate a key:
 
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -109,6 +115,14 @@ ENCRYPTION_KEY=<your-64-char-hex-string>
 ```
 
 **Key requirements:** Exactly 64 hex characters (32 bytes). The app will throw an error on startup if the key is present but the wrong length.
+
+**Rotating keys:**
+
+There is no built-in key rotation command. To rotate:
+
+1. Set the new `ENCRYPTION_KEY`.
+2. Existing tokens encrypted with the old key will fail to decrypt. The decryption function returns the ciphertext as-is when decryption fails (graceful fallback).
+3. Re-authenticate ("Connect X Account" or `xbook login`) to store tokens encrypted with the new key.
 
 ---
 

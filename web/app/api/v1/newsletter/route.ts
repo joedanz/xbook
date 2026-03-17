@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     }
     const dryRun = body.dry_run === true;
 
-    const repo = getRepository();
+    const repo = getRepository(auth.userId);
     const bookmarks = await repo.getNewBookmarks(200);
 
     if (bookmarks.length === 0) {
@@ -56,18 +56,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
     }
 
-    // Determine recipient
-    let recipientEmail: string | null = null;
-
-    recipientEmail = process.env.NEWSLETTER_TO || null;
+    // Determine recipient from env var
+    const recipientEmail = process.env.NEWSLETTER_TO || null;
 
     if (!recipientEmail) {
-      return NextResponse.json({ error: "No newsletter email configured" }, { status: 400 });
+      return NextResponse.json({ error: "No newsletter email configured. Set NEWSLETTER_TO in your .env.local" }, { status: 400 });
     }
 
     // Send email first — if it fails, bookmarks remain unmarked for the next attempt
     const { sendEmail } = await import("@shared/email");
-    const newsletterFrom = process.env.NEWSLETTER_FROM || "xbook <noreply@example.com>";
+    const newsletterFrom = process.env.NEWSLETTER_FROM || "xbook <newsletter@localhost>";
     try {
       await sendEmail(resendApiKey, newsletterFrom, recipientEmail, subject, html);
     } catch {

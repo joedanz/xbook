@@ -57,7 +57,7 @@ export async function GET(request: Request) {
       if (VALID_ORDER_DIR.has(od)) query.orderDir = od as BookmarkQuery["orderDir"];
     }
 
-    const repo = getRepository();
+    const repo = getRepository(auth.userId);
     const result = await repo.queryBookmarks(query);
 
     return NextResponse.json(result);

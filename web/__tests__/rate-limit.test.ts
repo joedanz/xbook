@@ -14,6 +14,8 @@ let getClientIp: typeof import("@/lib/rate-limit").getClientIp;
 beforeEach(async () => {
   vi.useFakeTimers();
   vi.resetModules();
+  // Ensure local mode (no DATABASE_URL) for in-memory tests
+  delete process.env.DATABASE_URL;
   const mod = await import("@/lib/rate-limit");
   checkRateLimit = mod.checkRateLimit;
   getClientIp = mod.getClientIp;

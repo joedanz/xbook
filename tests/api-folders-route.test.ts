@@ -34,8 +34,17 @@ import { authenticateApiRequest } from "../web/lib/api-auth";
 const mockedCheckRateLimit = vi.mocked(checkRateLimit);
 const mockedAuth = vi.mocked(authenticateApiRequest);
 
+let savedDbUrl: string | undefined;
+
 beforeEach(() => {
   vi.clearAllMocks();
+  savedDbUrl = process.env.DATABASE_URL;
+  delete process.env.DATABASE_URL;
+});
+
+afterEach(() => {
+  if (savedDbUrl !== undefined) process.env.DATABASE_URL = savedDbUrl;
+  else delete process.env.DATABASE_URL;
 });
 
 function makeRequest(): Request {

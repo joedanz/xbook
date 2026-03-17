@@ -1,4 +1,4 @@
-// ABOUTME: Tests for the connect-x OAuth callback route handler.
+// ABOUTME: Tests for the connect-x OAuth callback route handler (OSS overlay).
 // ABOUTME: Covers error cases: missing params, expired cookie, state mismatch, token exchange failure.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -18,7 +18,6 @@ vi.mock("@/lib/rate-limit", () => ({
   checkRateLimit: vi.fn().mockResolvedValue({ allowed: true, remaining: 9, resetAt: 0 }),
   getClientIp: vi.fn(() => "127.0.0.1"),
 }));
-
 
 import { GET } from "../web/app/api/connect-x/callback/route";
 
@@ -187,5 +186,4 @@ describe("connect-x callback", () => {
     const { writeFileSync } = await import("fs");
     expect(writeFileSync).toHaveBeenCalled();
   });
-
 });

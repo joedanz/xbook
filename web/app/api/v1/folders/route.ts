@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const repo = getRepository();
+    const repo = getRepository(auth.userId);
     const folders = await repo.getFolders();
 
     return NextResponse.json({ folders });

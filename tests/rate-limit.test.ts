@@ -5,6 +5,19 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { checkRateLimit, getClientIp } from "../web/lib/rate-limit";
 import type { RateLimitConfig } from "../web/lib/rate-limit";
 
+// Ensure local mode (no DATABASE_URL) so the in-memory backend is used.
+let savedDbUrl: string | undefined;
+
+beforeEach(() => {
+  savedDbUrl = process.env.DATABASE_URL;
+  delete process.env.DATABASE_URL;
+});
+
+afterEach(() => {
+  if (savedDbUrl !== undefined) {
+    process.env.DATABASE_URL = savedDbUrl;
+  }
+});
 
 // ── checkRateLimit (in-memory) ──────────────────────────────────────
 

@@ -127,7 +127,7 @@ export async function GET(request: Request) {
     expiresAt: Date.now() + data.expires_in * 1000,
   };
 
-  // Save tokens to disk
+  // Local mode: save tokens to disk
   const tokenPath = getTokenFilePath();
   writeFileSync(tokenPath, JSON.stringify(tokens, null, 2), "utf-8");
   chmodSync(tokenPath, 0o600);
@@ -155,4 +155,3 @@ function errorPage(message: string): string {
 h1{font-size:1.25rem;margin:0 0 .5rem}p{color:#666;margin:0 0 1rem}a{color:#000;font-weight:500}</style>
 </head><body><div class="card"><h1>Authentication Failed</h1><p>${escapeHtml(message)}</p><a href="/">Back to Dashboard</a></div></body></html>`;
 }
-
