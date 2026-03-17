@@ -13,3 +13,4 @@ dist/
 .claude/worktrees/
 .playwright-mcp/
 *.png
+.superpowers/
