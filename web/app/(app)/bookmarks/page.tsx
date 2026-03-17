@@ -8,6 +8,7 @@ import { SearchBar } from "@/components/search-bar";
 import { FilterBar } from "@/components/filter-bar";
 import { Pagination } from "@/components/pagination";
 import { SyncButton } from "@/components/sync-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +55,10 @@ export default async function BookmarksPage({ searchParams }: PageProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{title}</h1>
-        <SyncButton />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <SyncButton />
+        </div>
       </div>
 
       <Suspense>

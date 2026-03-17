@@ -3,6 +3,7 @@
 
 import type { BookmarkRepository } from "./repository";
 import type { SyncResult } from "./types";
+import type { ApiCallOptions } from "./api";
 import { getBookmarks, getBookmarkFolders, getFolderBookmarks, getMe, fetchArticleMetadata } from "./api";
 
 export type { SyncResult };
@@ -13,17 +14,20 @@ const MAX_PAGES = 200;
 export async function syncBookmarks(
   repo: BookmarkRepository,
   accessToken: string,
-  onProgress?: (message: string) => void
+  onProgress?: (message: string) => void,
+  onRateLimit?: (waitSeconds: number, attempt: number, maxRetries: number) => void
 ): Promise<SyncResult> {
   function log(msg: string) {
     console.log(msg);
     onProgress?.(msg);
   }
 
+  const apiOptions: ApiCallOptions | undefined = onRateLimit ? { onRateLimit } : undefined;
+
   // Get or cache user ID
   let userId = await repo.getUserInfo("user_id");
   if (!userId) {
-    const me = await getMe(accessToken);
+    const me = await getMe(accessToken, apiOptions);
     userId = me.id;
     await repo.setUserInfo("user_id", userId);
     await repo.setUserInfo("username", me.username);
@@ -43,7 +47,7 @@ export async function syncBookmarks(
       console.warn(`Pagination safety limit reached (${MAX_PAGES} pages). Stopping bookmark sync.`);
       break;
     }
-    const response = await getBookmarks(accessToken, userId, nextToken);
+    const response = await getBookmarks(accessToken, userId, nextToken, apiOptions);
     const logMsg =
       `Page ${page}: ${response.tweets.length} tweets` +
       (response.nextToken ? `, next_token: ${response.nextToken.slice(0, 20)}...` : ", no next_token (last page)");
@@ -78,7 +82,7 @@ export async function syncBookmarks(
       console.warn(`Pagination safety limit reached (${MAX_PAGES} pages). Stopping folder list sync.`);
       break;
     }
-    const folderResponse = await getBookmarkFolders(accessToken, userId, folderToken);
+    const folderResponse = await getBookmarkFolders(accessToken, userId, folderToken, apiOptions);
     for (const folder of folderResponse.folders) {
       foldersFound++;
       await repo.upsertFolder(folder);
@@ -96,7 +100,8 @@ export async function syncBookmarks(
           accessToken,
           userId,
           folder.id,
-          folderBookmarkToken
+          folderBookmarkToken,
+          apiOptions
         );
         log(`  → Got ${folderBookmarks.tweetIds.length} bookmark IDs`);
         if (folderBookmarks.tweetIds.length > 0) {

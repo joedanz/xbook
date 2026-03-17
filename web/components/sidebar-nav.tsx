@@ -5,7 +5,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Star, BookOpen, Upload, Mail, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 interface SidebarNavProps {
@@ -95,9 +94,7 @@ export function SidebarNav({ folders }: SidebarNavProps) {
         Settings
       </Link>
 
-      <div className="mt-auto pt-4 space-y-2">
-        <ThemeToggle />
-      </div>
+      <div className="mt-auto pt-4" />
     </>
   );
 }

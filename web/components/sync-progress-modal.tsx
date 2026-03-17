@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SyncProgressModalProps {
@@ -23,11 +23,20 @@ interface SyncProgressModalProps {
 
 type SyncStatus = "syncing" | "done" | "error";
 
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m > 0 ? `${m}m ${s.toString().padStart(2, "0")}s` : `${s}s`;
+}
+
 export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps) {
   const router = useRouter();
   const [status, setStatus] = useState<SyncStatus>("syncing");
   const [lines, setLines] = useState<string[]>([]);
   const [summary, setSummary] = useState("");
+  const [rateLimitEnd, setRateLimitEnd] = useState<number | null>(null);
+  const [rateLimitAttempt, setRateLimitAttempt] = useState("");
+  const [countdown, setCountdown] = useState(0);
   const logRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -35,6 +44,9 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
     setStatus("syncing");
     setLines([]);
     setSummary("");
+    setRateLimitEnd(null);
+    setRateLimitAttempt("");
+    setCountdown(0);
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -80,7 +92,12 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
           const data = JSON.parse(dataMatch[1]);
 
           if (event === "progress") {
+            setRateLimitEnd(null);
             setLines((prev) => [...prev, data.message]);
+          } else if (event === "ratelimit") {
+            setRateLimitEnd(Date.now() + data.waitSeconds * 1000);
+            setRateLimitAttempt(`Attempt ${data.attempt} of ${data.maxRetries}`);
+            setLines((prev) => [...prev, `Rate limited. Waiting ~${Math.ceil(data.waitSeconds / 60)}m ${data.waitSeconds % 60}s (attempt ${data.attempt}/${data.maxRetries})...`]);
           } else if (event === "done") {
             setStatus("done");
             setSummary(data.message);
@@ -108,6 +125,21 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
       abortRef.current?.abort();
     };
   }, [open, startSync]);
+
+  // Countdown timer for rate limit
+  useEffect(() => {
+    if (!rateLimitEnd) {
+      setCountdown(0);
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((rateLimitEnd - Date.now()) / 1000));
+      setCountdown(remaining);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [rateLimitEnd]);
 
   // Auto-scroll log to bottom
   useEffect(() => {
@@ -154,6 +186,20 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
             <DialogDescription>{summary}</DialogDescription>
           )}
         </DialogHeader>
+
+        {countdown > 0 && (
+          <div className="flex items-center gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+            <Timer className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Rate limited by X API
+              </p>
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                Retrying in {formatCountdown(countdown)} &middot; {rateLimitAttempt}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div
           ref={logRef}

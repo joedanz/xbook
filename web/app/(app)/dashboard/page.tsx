@@ -10,6 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { EmptyState } from "@/components/empty-state";
 import { SyncButton } from "@/components/sync-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { FormattedDate } from "@/components/formatted-date";
 import { BookmarkCard } from "@/components/bookmark-card";
 
@@ -37,7 +38,10 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <SyncButton />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <SyncButton />
+        </div>
       </div>
 
       {/* Stats cards */}

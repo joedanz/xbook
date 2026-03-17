@@ -1,23 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const cycle = { light: "dark", dark: "system", system: "light" } as const;
+const icons = { light: Sun, dark: Moon, system: Monitor } as const;
+const labels = { light: "Light", dark: "Dark", system: "System" } as const;
+
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const current = (theme as keyof typeof cycle) ?? "system";
+  const Icon = icons[current];
+
+  if (!mounted) return <div className="h-9 w-9" />;
 
   return (
     <Button
       variant="ghost"
-      size="sm"
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="w-full justify-start gap-2"
+      size="icon"
+      onClick={() => setTheme(cycle[current])}
+      aria-label={`Theme: ${labels[current]}`}
+      title={labels[current]}
     >
-      <Sun className="h-4 w-4 dark:hidden" aria-hidden="true" />
-      <Moon className="h-4 w-4 hidden dark:block" aria-hidden="true" />
-      <span className="dark:hidden">Dark mode</span>
-      <span className="hidden dark:block">Light mode</span>
+      <Icon className="h-4 w-4" aria-hidden="true" />
     </Button>
   );
 }

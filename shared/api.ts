@@ -9,6 +9,10 @@ import type {
   FolderResponse,
 } from "./types";
 
+export interface ApiCallOptions {
+  onRateLimit?: (waitSeconds: number, attempt: number, maxRetries: number) => void;
+}
+
 const BASE_URL = "https://api.x.com/2";
 const SYNDICATION_URL = "https://cdn.syndication.twimg.com";
 
@@ -16,7 +20,8 @@ async function apiGet(
   path: string,
   accessToken: string,
   params?: Record<string, string>,
-  maxRetries: number = 3
+  maxRetries: number = 3,
+  options?: ApiCallOptions
 ): Promise<unknown> {
   const url = new URL(`${BASE_URL}${path}`);
   if (params) {
@@ -39,6 +44,7 @@ async function apiGet(
         ? Math.max(1, parseInt(reset) - Math.floor(Date.now() / 1000))
         : 60;
       console.log(`Rate limited. Waiting ${waitSec}s before retry (attempt ${attempt + 1}/${maxRetries})...`);
+      options?.onRateLimit?.(waitSec, attempt + 1, maxRetries);
       await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
       continue;
     }
@@ -54,15 +60,16 @@ async function apiGet(
   throw new Error("apiGet: exhausted all retries without a response");
 }
 
-export async function getMe(accessToken: string): Promise<User> {
-  const data = (await apiGet("/users/me", accessToken)) as { data: User };
+export async function getMe(accessToken: string, options?: ApiCallOptions): Promise<User> {
+  const data = (await apiGet("/users/me", accessToken, undefined, 3, options)) as { data: User };
   return data.data;
 }
 
 export async function getBookmarks(
   accessToken: string,
   userId: string,
-  paginationToken?: string
+  paginationToken?: string,
+  options?: ApiCallOptions
 ): Promise<BookmarkResponse> {
   const params: Record<string, string> = {
     "tweet.fields": "created_at,author_id,attachments,entities",
@@ -97,7 +104,7 @@ export async function getBookmarks(
     article?: { title?: string };
   }
 
-  const data = (await apiGet(`/users/${userId}/bookmarks`, accessToken, params)) as {
+  const data = (await apiGet(`/users/${userId}/bookmarks`, accessToken, params, 3, options)) as {
     data?: RawTweet[];
     includes?: { users?: User[]; media?: MediaObject[] };
     meta?: { next_token?: string; result_count?: number };
@@ -181,14 +188,15 @@ export async function getBookmarks(
 export async function getBookmarkFolders(
   accessToken: string,
   userId: string,
-  paginationToken?: string
+  paginationToken?: string,
+  options?: ApiCallOptions
 ): Promise<FolderResponse> {
   const params: Record<string, string> = {};
   if (paginationToken) {
     params.pagination_token = paginationToken;
   }
 
-  const data = (await apiGet(`/users/${userId}/bookmarks/folders`, accessToken, params)) as {
+  const data = (await apiGet(`/users/${userId}/bookmarks/folders`, accessToken, params, 3, options)) as {
     data?: BookmarkFolder[];
     meta?: { next_token?: string };
   };
@@ -208,7 +216,8 @@ export async function getFolderBookmarks(
   accessToken: string,
   userId: string,
   folderId: string,
-  paginationToken?: string
+  paginationToken?: string,
+  options?: ApiCallOptions
 ): Promise<FolderBookmarkIdsResponse> {
   // The folder bookmarks endpoint only accepts id/folder_id params —
   // it does NOT support tweet.fields, expansions, user.fields, or max_results.
@@ -220,7 +229,9 @@ export async function getFolderBookmarks(
   const data = (await apiGet(
     `/users/${userId}/bookmarks/folders/${folderId}`,
     accessToken,
-    params
+    params,
+    3,
+    options
   )) as {
     data?: { id: string }[];
     meta?: { next_token?: string };

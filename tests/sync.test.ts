@@ -144,7 +144,7 @@ describe("syncBookmarks", () => {
 
     await syncBookmarks(repo, "token");
 
-    expect(mockGetMe).toHaveBeenCalledWith("token");
+    expect(mockGetMe).toHaveBeenCalledWith("token", undefined);
     expect(repo.setUserInfo).toHaveBeenCalledWith("user_id", "user456");
     expect(repo.setUserInfo).toHaveBeenCalledWith("username", "joe");
   });
@@ -169,8 +169,8 @@ describe("syncBookmarks", () => {
     const result = await syncBookmarks(repo, "token");
 
     expect(mockGetBookmarks).toHaveBeenCalledTimes(2);
-    expect(mockGetBookmarks).toHaveBeenCalledWith("token", "user123", undefined);
-    expect(mockGetBookmarks).toHaveBeenCalledWith("token", "user123", "next-page");
+    expect(mockGetBookmarks).toHaveBeenCalledWith("token", "user123", undefined, undefined);
+    expect(mockGetBookmarks).toHaveBeenCalledWith("token", "user123", "next-page", undefined);
     expect(result.fetched).toBe(2);
   });
 
@@ -266,8 +266,8 @@ describe("syncBookmarks", () => {
     const result = await syncBookmarks(repo, "token");
 
     expect(mockGetFolderBookmarks).toHaveBeenCalledTimes(2);
-    expect(mockGetFolderBookmarks).toHaveBeenCalledWith("token", "user123", "f1", undefined);
-    expect(mockGetFolderBookmarks).toHaveBeenCalledWith("token", "user123", "f1", "folder-page-2");
+    expect(mockGetFolderBookmarks).toHaveBeenCalledWith("token", "user123", "f1", undefined, undefined);
+    expect(mockGetFolderBookmarks).toHaveBeenCalledWith("token", "user123", "f1", "folder-page-2", undefined);
     expect(repo.assignBookmarkFolderBatch).toHaveBeenCalledTimes(2);
     expect(result.fetched).toBe(2);
   });
