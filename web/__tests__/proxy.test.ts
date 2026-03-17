@@ -1,7 +1,7 @@
 // ABOUTME: Tests for web/proxy.ts — CSP nonce generation proxy.
 // ABOUTME: Verifies CSP headers in production mode and passthrough in dev mode.
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Helpers to build mock NextRequest objects
@@ -32,10 +32,6 @@ let proxy: typeof import("@/proxy").proxy;
 
 beforeEach(async () => {
   vi.resetModules();
-});
-
-afterEach(() => {
-  process.env.NODE_ENV = "test";
 });
 
 async function loadProxy() {
