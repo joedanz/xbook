@@ -81,7 +81,8 @@ export default async function BookmarksPage({ searchParams }: PageProps) {
                   <BookmarkCard
                     key={bm.tweet_id}
                     bookmark={bm}
-                    folders={folders}
+
+
                   />
                 ))}
               </div>
@@ -97,7 +98,8 @@ export default async function BookmarksPage({ searchParams }: PageProps) {
             <BookmarkCard
               key={bm.tweet_id}
               bookmark={bm}
-              folders={folders}
+
+
             />
           ))}
         </div>

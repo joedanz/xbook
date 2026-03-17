@@ -14,17 +14,10 @@ import { FormattedDate } from "@/components/formatted-date";
 import { toggleStarred, toggleNeedToRead } from "@/lib/actions";
 import { tweetUrl } from "@shared/urls";
 
-interface Folder {
-  id: string;
-  name: string;
-}
-
 export function BookmarkCard({
   bookmark,
-  folders,
 }: {
   bookmark: StoredBookmark;
-  folders: Folder[];
 }) {
   const tags: string[] = useMemo(
     () => (bookmark.tags ? JSON.parse(bookmark.tags) : []),
@@ -128,8 +121,6 @@ export function BookmarkCard({
             </Button>
             <BookmarkActionsMenu
               tweetId={bookmark.tweet_id}
-              currentFolderId={bookmark.folder_id}
-              folders={folders}
               onEditNotes={
                 !editingNotes && !bookmark.notes
                   ? () => setEditingNotes(true)

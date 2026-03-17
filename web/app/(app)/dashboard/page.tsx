@@ -27,7 +27,6 @@ export default async function DashboardPage() {
     orderBy: "synced_at",
     orderDir: "desc",
   });
-  const folders = await repo.getFolders();
   const syncHistory = await repo.getSyncHistory(3);
 
   if (stats.totalBookmarks === 0) {
@@ -100,7 +99,7 @@ export default async function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {recentBookmarks.items.map((bm) => (
-            <BookmarkCard key={bm.tweet_id} bookmark={bm} folders={folders} />
+            <BookmarkCard key={bm.tweet_id} bookmark={bm} />
           ))}
         </div>
       </div>

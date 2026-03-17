@@ -80,7 +80,7 @@ export default async function FolderPage({ params, searchParams }: PageProps) {
           style={{ "--cols": cols } as React.CSSProperties}
         >
           {result.items.map((bm) => (
-            <BookmarkCard key={bm.tweet_id} bookmark={bm} folders={folders} />
+            <BookmarkCard key={bm.tweet_id} bookmark={bm} />
           ))}
         </div>
       )}

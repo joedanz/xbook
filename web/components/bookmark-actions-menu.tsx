@@ -18,24 +18,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoveFolderDialog } from "@/components/move-folder-dialog";
 import { deleteBookmark } from "@/lib/actions";
 import { toast } from "sonner";
 
-interface Folder {
-  id: string;
-  name: string;
-}
-
 export function BookmarkActionsMenu({
   tweetId,
-  currentFolderId,
-  folders,
   onEditNotes,
 }: {
   tweetId: string;
-  currentFolderId: string | null;
-  folders: Folder[];
   onEditNotes?: () => void;
 }) {
   const [deleting, setDeleting] = useState(false);
@@ -76,15 +66,6 @@ export function BookmarkActionsMenu({
               Edit notes
             </DropdownMenuItem>
           )}
-          <MoveFolderDialog
-            tweetId={tweetId}
-            currentFolderId={currentFolderId}
-            folders={folders}
-          >
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              Move to folder
-            </DropdownMenuItem>
-          </MoveFolderDialog>
           <DropdownMenuItem
             onSelect={handleDelete}
             disabled={deleting}
