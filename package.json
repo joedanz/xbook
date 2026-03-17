@@ -20,7 +20,7 @@
   "dependencies": {
     "better-sqlite3": "^12.8.0",
     "commander": "^14.0.3",
-    "node-cron": "^3.0.3",
+    "node-cron": "^4.2.1",
     "resend": "^4.1.2"
   },
   "devDependencies": {
