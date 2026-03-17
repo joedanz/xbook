@@ -1,10 +1,10 @@
-// ABOUTME: Middleware for CSP nonce generation.
+// ABOUTME: Proxy for CSP nonce generation.
 // ABOUTME: Adds Content-Security-Policy headers to all responses.
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = [
     `default-src 'self'`,
