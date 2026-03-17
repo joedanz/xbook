@@ -1,4 +1,3 @@
-import { SafeImage } from "@/components/safe-image";
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { getRepository } from "@/lib/db";
@@ -8,11 +7,11 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { EmptyState } from "@/components/empty-state";
 import { SyncButton } from "@/components/sync-button";
 import { FormattedDate } from "@/components/formatted-date";
+import { BookmarkCard } from "@/components/bookmark-card";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +27,7 @@ export default async function DashboardPage() {
     orderBy: "synced_at",
     orderDir: "desc",
   });
+  const folders = await repo.getFolders();
   const syncHistory = await repo.getSyncHistory(3);
 
   if (stats.totalBookmarks === 0) {
@@ -100,62 +100,7 @@ export default async function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {recentBookmarks.items.map((bm) => (
-            <Card key={bm.tweet_id} className="overflow-hidden flex flex-col">
-              {(bm.media_url || bm.url_image) && (
-                <a
-                  href={bm.expanded_url || `https://x.com/${bm.author_username || "i"}/status/${bm.tweet_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={bm.url_title || `View bookmark by ${bm.author_name || "unknown"}`}
-                  className="relative block aspect-video"
-                >
-                  <SafeImage
-                    src={bm.media_url || bm.url_image!}
-                    alt={`${bm.author_name || bm.author_username || "Unknown"}: ${bm.text?.substring(0, 100) || bm.url_title || "bookmark"}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                </a>
-              )}
-              <CardContent className="pt-3 flex-1 flex flex-col">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="font-medium text-sm">
-                    {bm.author_name || "Unknown"}
-                  </span>
-                  {bm.author_username && (
-                    <span className="text-muted-foreground text-xs">
-                      @{bm.author_username}
-                    </span>
-                  )}
-                </div>
-                {bm.url_title ? (
-                  <p className="text-sm font-medium line-clamp-2 flex-1">
-                    {bm.url_title}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
-                    {bm.text}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  {bm.folder_name && (
-                    <Badge variant="outline" className="text-xs">
-                      {bm.folder_name}
-                    </Badge>
-                  )}
-                  <a
-                    href={`https://x.com/${bm.author_username || "i"}/status/${bm.tweet_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`View bookmark by ${bm.author_name || bm.author_username || "unknown"} on X`}
-                    className="text-xs text-blue-500 hover:underline ml-auto"
-                  >
-                    View on X<span className="sr-only"> (opens in new tab)</span>
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
+            <BookmarkCard key={bm.tweet_id} bookmark={bm} folders={folders} />
           ))}
         </div>
       </div>
