@@ -27,7 +27,6 @@ cd web && npm install && cd ..
 
 ```bash
 cp .env.local.example .env.local
-cp .env.local web/.env.local
 ```
 
 4. Start the web dev server:

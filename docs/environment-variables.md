@@ -53,7 +53,6 @@ Complete reference for all xbook environment variables.
 | File | Used by | Description |
 |------|---------|-------------|
 | `.env` | Docker (`docker compose`) | Environment variables for Docker deployments. Copy from `.env.example`. |
-| `.env.local` | Local dev (Next.js, CLI) | Environment variables for local development. Copy from `.env.local.example`. Not committed to git. |
-| `web/.env.local` | Web dev server only | Copy of `.env.local` for the Next.js dev server (reads from its own directory). |
+| `.env.local` | Local dev (Next.js, CLI) | Environment variables for local development. Copy from `.env.local.example`. Next.js reads this automatically from the project root via `next.config.ts`. Not committed to git. |
 | `~/.xbook/config.json` | CLI client | Stores CLI settings (API key, API URL). Managed by `xbook login` / `xbook logout`. |
 | `.tokens.json` | Local mode | OAuth tokens file. Created by web OAuth flow. Permissions set to `0600`. |
