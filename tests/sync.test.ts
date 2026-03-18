@@ -84,6 +84,7 @@ function createMockRepo(): BookmarkRepository & { [key: string]: ReturnType<type
     hideBookmark: vi.fn().mockResolvedValue(false),
     unhideBookmark: vi.fn().mockResolvedValue(false),
     getHiddenTweetIds: vi.fn().mockResolvedValue(new Set()),
+    getAllNonHiddenTweetIds: vi.fn().mockResolvedValue(new Set()),
     moveBookmarkToFolder: vi.fn().mockResolvedValue(false),
     updateBookmarkNotes: vi.fn().mockResolvedValue(false),
     toggleStarred: vi.fn().mockResolvedValue(false),

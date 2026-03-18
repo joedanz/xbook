@@ -73,7 +73,23 @@ export async function syncBookmarks(
     }
     nextToken = response.nextToken;
   } while (nextToken);
+  const fullSync = page <= MAX_PAGES; // true if pagination exhausted naturally
   log(`Bookmark sync complete: ${fetched} total across ${page} page(s)`);
+
+  // Mark-and-sweep: auto-hide bookmarks removed from X (only after a full sync)
+  let removedCount = 0;
+  if (fullSync && seen.size > 0) {
+    const localIds = await repo.getAllNonHiddenTweetIds();
+    for (const id of localIds) {
+      if (!seen.has(id) && !hiddenIds.has(id)) {
+        await repo.hideBookmark(id);
+        removedCount++;
+      }
+    }
+    if (removedCount > 0) {
+      log(`Auto-hidden ${removedCount} bookmark(s) removed from X`);
+    }
+  }
 
   // Fetch folders and assign bookmarks to them.
   // The folder bookmarks endpoint only returns tweet IDs (no expansions),
@@ -136,5 +152,5 @@ export async function syncBookmarks(
   }
 
   await repo.logSync(fetched, newCount);
-  return { fetched, newCount, foldersFound, folderAssignments, articleImagesFound: articlesEnriched, pages: page, paginationLog };
+  return { fetched, newCount, removedCount, foldersFound, folderAssignments, articleImagesFound: articlesEnriched, pages: page, paginationLog };
 }

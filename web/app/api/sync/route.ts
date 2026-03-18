@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Synced ${result.fetched} bookmarks (${result.newCount} new) across ${result.pages} page(s)`,
+      message: `Synced ${result.fetched} bookmarks (${result.newCount} new${result.removedCount ? `, ${result.removedCount} removed` : ""}) across ${result.pages} page(s)`,
       ...result,
     });
   } catch (error) {
@@ -107,7 +107,7 @@ function streamSync(accessToken: string): Response {
 
         controller.enqueue(encoder.encode(sseEvent("done", {
           success: true,
-          message: `Synced ${result.fetched} bookmarks (${result.newCount} new) across ${result.pages} page(s)`,
+          message: `Synced ${result.fetched} bookmarks (${result.newCount} new${result.removedCount ? `, ${result.removedCount} removed` : ""}) across ${result.pages} page(s)`,
           fetched: result.fetched,
           newCount: result.newCount,
         })));

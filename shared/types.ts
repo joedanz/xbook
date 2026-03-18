@@ -67,6 +67,7 @@ export interface StoredBookmark {
 export interface SyncResult {
   fetched: number;
   newCount: number;
+  removedCount: number;
   foldersFound: number;
   folderAssignments: number;
   articleImagesFound: number;
