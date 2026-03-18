@@ -518,13 +518,6 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
     return new Set(rows.map((r) => r.tweet_id));
   }
 
-  async getAllNonHiddenTweetIds(): Promise<Set<string>> {
-    const rows = this.db
-      .prepare("SELECT tweet_id FROM bookmarks WHERE hidden = 0 OR hidden IS NULL")
-      .all() as { tweet_id: string }[];
-    return new Set(rows.map((r) => r.tweet_id));
-  }
-
   async moveBookmarkToFolder(
     tweetId: string,
     folderId: string | null,

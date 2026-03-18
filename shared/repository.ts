@@ -66,7 +66,6 @@ export interface BookmarkRepository {
   hideBookmark(tweetId: string): Promise<boolean>;
   unhideBookmark(tweetId: string): Promise<boolean>;
   getHiddenTweetIds(): Promise<Set<string>>;
-  getAllNonHiddenTweetIds(): Promise<Set<string>>;
   moveBookmarkToFolder(
     tweetId: string,
     folderId: string | null,
