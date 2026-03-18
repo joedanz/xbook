@@ -117,10 +117,9 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
   }, []);
 
   // Start sync when modal opens
-  // eslint-disable-next-line react-compiler/react-compiler -- async operation trigger
   useEffect(() => {
     if (open) {
-      startSync();
+      startSync(); // eslint-disable-line react-hooks/set-state-in-effect -- async operation trigger
     }
     return () => {
       abortRef.current?.abort();
@@ -128,10 +127,9 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
   }, [open, startSync]);
 
   // Countdown timer for rate limit
-  // eslint-disable-next-line react-compiler/react-compiler -- countdown reset is intentional
   useEffect(() => {
     if (!rateLimitEnd) {
-      setCountdown(0);
+      setCountdown(0); // eslint-disable-line react-hooks/set-state-in-effect -- countdown reset
       return;
     }
     const tick = () => {

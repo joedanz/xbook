@@ -12,7 +12,7 @@ const labels = { light: "Light", dark: "Dark", system: "System" } as const;
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  // eslint-disable-next-line react-compiler/react-compiler -- hydration-safe mount check
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe mount check
   useEffect(() => setMounted(true), []);
 
   const current = (theme as keyof typeof cycle) ?? "system";
