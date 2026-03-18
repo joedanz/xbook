@@ -117,6 +117,7 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
   }, []);
 
   // Start sync when modal opens
+  // eslint-disable-next-line react-compiler/react-compiler -- async operation trigger
   useEffect(() => {
     if (open) {
       startSync();
@@ -127,6 +128,7 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
   }, [open, startSync]);
 
   // Countdown timer for rate limit
+  // eslint-disable-next-line react-compiler/react-compiler -- countdown reset is intentional
   useEffect(() => {
     if (!rateLimitEnd) {
       setCountdown(0);
