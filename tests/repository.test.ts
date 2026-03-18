@@ -328,6 +328,73 @@ describe("SqliteBookmarkRepository", () => {
     });
   });
 
+  describe("deleteBookmark / undeleteBookmark", () => {
+    it("deleteBookmark soft-deletes (sets deleted flag)", async () => {
+      await seedBookmarks();
+      const result = await repo.deleteBookmark("t1");
+      expect(result).toBe(true);
+      const bm = await repo.getBookmarkById("t1");
+      expect(bm).not.toBeNull();
+      expect(bm!.deleted).toBe(true);
+    });
+
+    it("undeleteBookmark restores a deleted bookmark", async () => {
+      await seedBookmarks();
+      await repo.deleteBookmark("t1");
+      const result = await repo.undeleteBookmark("t1");
+      expect(result).toBe(true);
+      const bm = await repo.getBookmarkById("t1");
+      expect(bm!.deleted).toBe(false);
+    });
+
+    it("deleted bookmarks excluded from default getBookmarkCount", async () => {
+      await seedBookmarks();
+      expect(await repo.getBookmarkCount()).toBe(4);
+      await repo.deleteBookmark("t1");
+      expect(await repo.getBookmarkCount()).toBe(3);
+    });
+
+    it("deleted bookmarks excluded from default queryBookmarks", async () => {
+      await seedBookmarks();
+      await repo.deleteBookmark("t1");
+      const result = await repo.queryBookmarks({});
+      expect(result.items.find((b) => b.tweet_id === "t1")).toBeUndefined();
+    });
+
+    it("deleted bookmarks visible with deleted=true query", async () => {
+      await seedBookmarks();
+      await repo.deleteBookmark("t1");
+      const result = await repo.queryBookmarks({ deleted: true });
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].tweet_id).toBe("t1");
+    });
+
+    it("getHiddenTweetIds includes deleted bookmark IDs", async () => {
+      await seedBookmarks();
+      await repo.deleteBookmark("t2");
+      const ids = await repo.getHiddenTweetIds();
+      expect(ids.has("t2")).toBe(true);
+    });
+
+    it("hidden and deleted are independent", async () => {
+      await seedBookmarks();
+      await repo.hideBookmark("t1");
+      await repo.deleteBookmark("t1");
+      const bm = await repo.getBookmarkById("t1");
+      expect(bm!.hidden).toBe(true);
+      expect(bm!.deleted).toBe(true);
+      await repo.unhideBookmark("t1");
+      const bm2 = await repo.getBookmarkById("t1");
+      expect(bm2!.hidden).toBe(false);
+      expect(bm2!.deleted).toBe(true);
+    });
+
+    it("returns false for non-existent bookmark", async () => {
+      expect(await repo.deleteBookmark("nonexistent")).toBe(false);
+      expect(await repo.undeleteBookmark("nonexistent")).toBe(false);
+    });
+  });
+
   describe("moveBookmarkToFolder", () => {
     it("moves bookmark to a different folder", async () => {
       await seedBookmarks();

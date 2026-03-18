@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Star, BookOpen, EyeOff, Upload, Mail, Settings } from "lucide-react";
+import { Star, BookOpen, EyeOff, Trash2, Upload, Mail, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,7 @@ export function SidebarNav({ folders }: SidebarNavProps) {
     if (href === "/bookmarks?filter=starred") return pathname === "/bookmarks" && filter === "starred";
     if (href === "/bookmarks?filter=need-to-read") return pathname === "/bookmarks" && filter === "need-to-read";
     if (href === "/bookmarks?filter=hidden") return pathname === "/bookmarks" && filter === "hidden";
+    if (href === "/bookmarks?filter=deleted") return pathname === "/bookmarks" && filter === "deleted";
     return pathname === href;
   }
 
@@ -62,6 +63,14 @@ export function SidebarNav({ folders }: SidebarNavProps) {
       >
         <EyeOff className="h-4 w-4" aria-hidden="true" />
         Hidden
+      </Link>
+      <Link
+        href="/bookmarks?filter=deleted"
+        className={link("/bookmarks?filter=deleted", "flex items-center gap-2 text-muted-foreground text-xs")}
+        aria-current={isActive("/bookmarks?filter=deleted") ? "page" : undefined}
+      >
+        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+        Deleted
       </Link>
       <Link href="/import" className={link("/import", "flex items-center gap-2")} aria-current={isActive("/import") ? "page" : undefined}>
         <Upload className="h-4 w-4" aria-hidden="true" />

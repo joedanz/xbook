@@ -32,6 +32,7 @@ export default async function BookmarksPage({ searchParams }: PageProps) {
     starred: filter === "starred" ? true : undefined,
     needToRead: filter === "need-to-read" ? true : undefined,
     hidden: filter === "hidden" ? true : undefined,
+    deleted: filter === "deleted" ? true : undefined,
     orderBy:
       (params.sort as BookmarkQuery["orderBy"]) || "created_at",
     orderDir: "desc",
@@ -52,7 +53,9 @@ export default async function BookmarksPage({ searchParams }: PageProps) {
         ? "Need to Read"
         : filter === "hidden"
           ? "Hidden Bookmarks"
-          : "Bookmarks";
+          : filter === "deleted"
+            ? "Deleted Bookmarks"
+            : "Bookmarks";
 
   return (
     <div className="space-y-4">
@@ -104,6 +107,7 @@ export default async function BookmarksPage({ searchParams }: PageProps) {
               key={bm.tweet_id}
               bookmark={bm}
               isHidden={filter === "hidden"}
+              isDeleted={filter === "deleted"}
             />
           ))}
         </div>

@@ -49,6 +49,36 @@ export async function unhideBookmark(tweetId: string) {
   return { success: unhidden };
 }
 
+export async function deleteBookmark(tweetId: string) {
+  const invalid = validateId(tweetId, "tweet ID");
+  if (invalid) return invalid;
+  const { userId } = await requireUser();
+  const rl = await checkRateLimit(`action:${userId}`, ACTION_RATE_LIMIT);
+  if (!rl.allowed) return { success: false as const, error: "Too many requests" };
+  const repo = getRepository();
+  const deleted = await repo.deleteBookmark(tweetId);
+  if (deleted) {
+    revalidatePath("/bookmarks");
+    revalidatePath("/dashboard");
+  }
+  return { success: deleted };
+}
+
+export async function undeleteBookmark(tweetId: string) {
+  const invalid = validateId(tweetId, "tweet ID");
+  if (invalid) return invalid;
+  const { userId } = await requireUser();
+  const rl = await checkRateLimit(`action:${userId}`, ACTION_RATE_LIMIT);
+  if (!rl.allowed) return { success: false as const, error: "Too many requests" };
+  const repo = getRepository();
+  const restored = await repo.undeleteBookmark(tweetId);
+  if (restored) {
+    revalidatePath("/bookmarks");
+    revalidatePath("/dashboard");
+  }
+  return { success: restored };
+}
+
 export async function moveBookmark(
   tweetId: string,
   folderId: string | null,

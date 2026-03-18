@@ -22,6 +22,7 @@ function coerceBooleans(row: Record<string, unknown>): StoredBookmark {
     starred: row.starred === 1,
     need_to_read: row.need_to_read === 1,
     hidden: row.hidden === 1,
+    deleted: row.deleted === 1,
   } as StoredBookmark;
 }
 
@@ -123,6 +124,11 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
         "ALTER TABLE bookmarks ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0"
       );
     }
+    if (!columnNames.has("deleted")) {
+      this.db.exec(
+        "ALTER TABLE bookmarks ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0"
+      );
+    }
     // Create indexes (IF NOT EXISTS is safe for repeated runs)
     const indexStatements = [
       "CREATE INDEX IF NOT EXISTS idx_bookmarks_synced_at ON bookmarks(synced_at)",
@@ -132,6 +138,7 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
       "CREATE INDEX IF NOT EXISTS idx_bookmarks_starred ON bookmarks(starred) WHERE starred = 1",
       "CREATE INDEX IF NOT EXISTS idx_bookmarks_need_to_read ON bookmarks(need_to_read) WHERE need_to_read = 1",
       "CREATE INDEX IF NOT EXISTS idx_bookmarks_hidden ON bookmarks(hidden) WHERE hidden = 1",
+      "CREATE INDEX IF NOT EXISTS idx_bookmarks_deleted ON bookmarks(deleted) WHERE deleted = 1",
     ];
     for (const stmt of indexStatements) {
       this.db.prepare(stmt).run();
@@ -247,7 +254,7 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
 
   async getBookmarkCount(): Promise<number> {
     const row = this.db
-      .prepare("SELECT COUNT(*) as count FROM bookmarks WHERE hidden = 0 OR hidden IS NULL")
+      .prepare("SELECT COUNT(*) as count FROM bookmarks WHERE (hidden = 0 OR hidden IS NULL) AND (deleted = 0 OR deleted IS NULL)")
       .get() as { count: number };
     return row.count;
   }
@@ -420,6 +427,12 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
       conditions.push("(hidden = 0 OR hidden IS NULL)");
     }
 
+    if (query.deleted === true) {
+      conditions.push("deleted = 1");
+    } else {
+      conditions.push("(deleted = 0 OR deleted IS NULL)");
+    }
+
     const where =
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     const ALLOWED_ORDER_BY = new Set(["created_at", "synced_at", "author_name"]);
@@ -511,9 +524,23 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
     return result.changes > 0;
   }
 
+  async deleteBookmark(tweetId: string): Promise<boolean> {
+    const result = this.db
+      .prepare("UPDATE bookmarks SET deleted = 1 WHERE tweet_id = ?")
+      .run(tweetId);
+    return result.changes > 0;
+  }
+
+  async undeleteBookmark(tweetId: string): Promise<boolean> {
+    const result = this.db
+      .prepare("UPDATE bookmarks SET deleted = 0 WHERE tweet_id = ?")
+      .run(tweetId);
+    return result.changes > 0;
+  }
+
   async getHiddenTweetIds(): Promise<Set<string>> {
     const rows = this.db
-      .prepare("SELECT tweet_id FROM bookmarks WHERE hidden = 1")
+      .prepare("SELECT tweet_id FROM bookmarks WHERE hidden = 1 OR deleted = 1")
       .all() as { tweet_id: string }[];
     return new Set(rows.map((r) => r.tweet_id));
   }

@@ -21,8 +21,9 @@ export function MobileNav({ folders }: MobileNavProps) {
   const [open, setOpen] = useState(false);
 
   // Close sheet on navigation instead of using key={pathname} which forces re-mount
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional close-on-navigate
-  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <div className="md:hidden sticky top-0 z-50 bg-background border-b px-4 py-3 flex items-center gap-2">

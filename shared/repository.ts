@@ -1,5 +1,5 @@
 // ABOUTME: BookmarkRepository interface — the abstraction layer for data access.
-// ABOUTME: All methods are async to support both SQLite and Postgres backends.
+// ABOUTME: All methods are async for interface consistency.
 
 import type {
   StoredBookmark,
@@ -65,6 +65,8 @@ export interface BookmarkRepository {
   // --- Management operations (for web UI) ---
   hideBookmark(tweetId: string): Promise<boolean>;
   unhideBookmark(tweetId: string): Promise<boolean>;
+  deleteBookmark(tweetId: string): Promise<boolean>;
+  undeleteBookmark(tweetId: string): Promise<boolean>;
   getHiddenTweetIds(): Promise<Set<string>>;
   moveBookmarkToFolder(
     tweetId: string,
