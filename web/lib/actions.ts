@@ -19,19 +19,34 @@ function validateId(id: string, label: string, maxLen = MAX_TWEET_ID_LEN) {
   return null;
 }
 
-export async function deleteBookmark(tweetId: string) {
+export async function hideBookmark(tweetId: string) {
   const invalid = validateId(tweetId, "tweet ID");
   if (invalid) return invalid;
   const { userId } = await requireUser();
   const rl = await checkRateLimit(`action:${userId}`, ACTION_RATE_LIMIT);
   if (!rl.allowed) return { success: false as const, error: "Too many requests" };
   const repo = getRepository();
-  const deleted = await repo.deleteBookmark(tweetId);
-  if (deleted) {
+  const hidden = await repo.hideBookmark(tweetId);
+  if (hidden) {
     revalidatePath("/bookmarks");
     revalidatePath("/dashboard");
   }
-  return { success: deleted };
+  return { success: hidden };
+}
+
+export async function unhideBookmark(tweetId: string) {
+  const invalid = validateId(tweetId, "tweet ID");
+  if (invalid) return invalid;
+  const { userId } = await requireUser();
+  const rl = await checkRateLimit(`action:${userId}`, ACTION_RATE_LIMIT);
+  if (!rl.allowed) return { success: false as const, error: "Too many requests" };
+  const repo = getRepository();
+  const unhidden = await repo.unhideBookmark(tweetId);
+  if (unhidden) {
+    revalidatePath("/bookmarks");
+    revalidatePath("/dashboard");
+  }
+  return { success: unhidden };
 }
 
 export async function moveBookmark(

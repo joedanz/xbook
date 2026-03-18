@@ -236,9 +236,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Bookmark not found" }, { status: 404 });
     }
 
-    await repo.deleteBookmark(id);
+    await repo.hideBookmark(id);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: "Bookmark hidden" });
   } catch (error) {
     console.error("DELETE /api/v1/bookmarks/[id] error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

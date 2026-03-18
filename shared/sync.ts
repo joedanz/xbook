@@ -33,6 +33,9 @@ export async function syncBookmarks(
     await repo.setUserInfo("username", me.username);
   }
 
+  // Load hidden IDs so we can skip them during upsert
+  const hiddenIds = await repo.getHiddenTweetIds();
+
   let fetched = 0;
   let newCount = 0;
   const seen = new Set<string>();
@@ -60,9 +63,12 @@ export async function syncBookmarks(
       return true;
     });
 
-    if (uniqueTweets.length > 0) {
-      const result = await repo.upsertBookmarksBatch(uniqueTweets, response.users);
-      fetched += uniqueTweets.length;
+    // Filter out previously hidden bookmarks so they aren't re-imported
+    const visibleTweets = uniqueTweets.filter((t) => !hiddenIds.has(t.id));
+
+    if (visibleTweets.length > 0) {
+      const result = await repo.upsertBookmarksBatch(visibleTweets, response.users);
+      fetched += visibleTweets.length;
       newCount += result.imported;
     }
     nextToken = response.nextToken;

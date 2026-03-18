@@ -25,6 +25,7 @@ function makeBookmark(
     expanded_url: null,
     starred: false,
     need_to_read: false,
+    hidden: false,
     ...overrides,
   };
 }

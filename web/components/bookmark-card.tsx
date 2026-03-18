@@ -16,8 +16,10 @@ import { tweetUrl } from "@shared/urls";
 
 export function BookmarkCard({
   bookmark,
+  isHidden,
 }: {
   bookmark: StoredBookmark;
+  isHidden?: boolean;
 }) {
   const tags: string[] = useMemo(
     () => (bookmark.tags ? JSON.parse(bookmark.tags) : []),
@@ -121,6 +123,7 @@ export function BookmarkCard({
             </Button>
             <BookmarkActionsMenu
               tweetId={bookmark.tweet_id}
+              isHidden={isHidden}
               onEditNotes={
                 !editingNotes && !bookmark.notes
                   ? () => setEditingNotes(true)

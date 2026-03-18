@@ -11,7 +11,8 @@ vi.mock("@/lib/session", () => ({
 
 // Mock repository
 const mockRepo = {
-  deleteBookmark: vi.fn(),
+  hideBookmark: vi.fn(),
+  unhideBookmark: vi.fn(),
   moveBookmarkToFolder: vi.fn(),
   updateBookmarkNotes: vi.fn(),
   addBookmarkTag: vi.fn(),
@@ -56,7 +57,8 @@ vi.mock("@shared/email", () => ({
 
 // Import after mocks are set up
 const {
-  deleteBookmark,
+  hideBookmark,
+  unhideBookmark,
   moveBookmark,
   updateNotes,
   addTag,
@@ -72,20 +74,40 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("deleteBookmark", () => {
-  it("calls repo.deleteBookmark and revalidates on success", async () => {
-    mockRepo.deleteBookmark.mockResolvedValue(true);
-    const result = await deleteBookmark("tweet-1");
+describe("hideBookmark", () => {
+  it("calls repo.hideBookmark and revalidates on success", async () => {
+    mockRepo.hideBookmark.mockResolvedValue(true);
+    const result = await hideBookmark("tweet-1");
 
-    expect(mockRepo.deleteBookmark).toHaveBeenCalledWith("tweet-1");
+    expect(mockRepo.hideBookmark).toHaveBeenCalledWith("tweet-1");
     expect(revalidatePath).toHaveBeenCalledWith("/bookmarks");
     expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
     expect(result).toEqual({ success: true });
   });
 
   it("does NOT revalidate when repo returns false", async () => {
-    mockRepo.deleteBookmark.mockResolvedValue(false);
-    const result = await deleteBookmark("tweet-missing");
+    mockRepo.hideBookmark.mockResolvedValue(false);
+    const result = await hideBookmark("tweet-missing");
+
+    expect(revalidatePath).not.toHaveBeenCalled();
+    expect(result).toEqual({ success: false });
+  });
+});
+
+describe("unhideBookmark", () => {
+  it("calls repo.unhideBookmark and revalidates on success", async () => {
+    mockRepo.unhideBookmark.mockResolvedValue(true);
+    const result = await unhideBookmark("tweet-1");
+
+    expect(mockRepo.unhideBookmark).toHaveBeenCalledWith("tweet-1");
+    expect(revalidatePath).toHaveBeenCalledWith("/bookmarks");
+    expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
+    expect(result).toEqual({ success: true });
+  });
+
+  it("does NOT revalidate when repo returns false", async () => {
+    mockRepo.unhideBookmark.mockResolvedValue(false);
+    const result = await unhideBookmark("tweet-missing");
 
     expect(revalidatePath).not.toHaveBeenCalled();
     expect(result).toEqual({ success: false });

@@ -59,6 +59,7 @@ export interface StoredBookmark {
   expanded_url: string | null;
   starred: boolean;
   need_to_read: boolean;
+  hidden: boolean;
 }
 
 // --- Sync types ---
@@ -85,6 +86,7 @@ export interface BookmarkQuery {
   newslettered?: boolean;
   starred?: boolean;
   needToRead?: boolean;
+  hidden?: boolean;
   page?: number;
   pageSize?: number;
   orderBy?: "created_at" | "synced_at" | "author_name";

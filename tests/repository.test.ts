@@ -282,18 +282,49 @@ describe("SqliteBookmarkRepository", () => {
     });
   });
 
-  describe("deleteBookmark", () => {
-    it("deletes an existing bookmark", async () => {
+  describe("hideBookmark / unhideBookmark / getHiddenTweetIds", () => {
+    it("hideBookmark marks a bookmark as hidden", async () => {
+      await seedBookmarks();
+      const result = await repo.hideBookmark("t1");
+      expect(result).toBe(true);
+      const bm = await repo.getBookmarkById("t1");
+      expect(bm).not.toBeNull();
+      expect(bm!.hidden).toBe(true);
+    });
+
+    it("unhideBookmark restores a hidden bookmark", async () => {
+      await seedBookmarks();
+      await repo.hideBookmark("t1");
+      const result = await repo.unhideBookmark("t1");
+      expect(result).toBe(true);
+      const bm = await repo.getBookmarkById("t1");
+      expect(bm!.hidden).toBe(false);
+    });
+
+    it("hidden bookmarks excluded from default getBookmarkCount", async () => {
       await seedBookmarks();
       expect(await repo.getBookmarkCount()).toBe(4);
-      const deleted = await repo.deleteBookmark("t1");
-      expect(deleted).toBe(true);
+      await repo.hideBookmark("t1");
       expect(await repo.getBookmarkCount()).toBe(3);
-      expect(await repo.getBookmarkById("t1")).toBeNull();
+      await repo.hideBookmark("t2");
+      expect(await repo.getBookmarkCount()).toBe(2);
+    });
+
+    it("getHiddenTweetIds returns the correct Set of IDs", async () => {
+      await seedBookmarks();
+      await repo.hideBookmark("t1");
+      await repo.hideBookmark("t3");
+      const hiddenIds = await repo.getHiddenTweetIds();
+      expect(hiddenIds).toBeInstanceOf(Set);
+      expect(hiddenIds.size).toBe(2);
+      expect(hiddenIds.has("t1")).toBe(true);
+      expect(hiddenIds.has("t3")).toBe(true);
+      expect(hiddenIds.has("t2")).toBe(false);
     });
 
     it("returns false for non-existent bookmark", async () => {
-      expect(await repo.deleteBookmark("nonexistent")).toBe(false);
+      expect(await repo.hideBookmark("nonexistent")).toBe(false);
+      expect(await repo.unhideBookmark("nonexistent")).toBe(false);
     });
   });
 

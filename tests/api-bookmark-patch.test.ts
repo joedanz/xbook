@@ -27,7 +27,7 @@ const mockUpdateBookmarkNotes = vi.fn();
 const mockAddBookmarkTag = vi.fn();
 const mockRemoveBookmarkTag = vi.fn();
 const mockMoveBookmarkToFolder = vi.fn();
-const mockDeleteBookmark = vi.fn();
+const mockHideBookmark = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   getRepository: vi.fn(() => ({
@@ -38,7 +38,7 @@ vi.mock("@/lib/db", () => ({
     addBookmarkTag: mockAddBookmarkTag,
     removeBookmarkTag: mockRemoveBookmarkTag,
     moveBookmarkToFolder: mockMoveBookmarkToFolder,
-    deleteBookmark: mockDeleteBookmark,
+    hideBookmark: mockHideBookmark,
   })),
 }));
 
@@ -176,10 +176,12 @@ describe("DELETE /api/v1/bookmarks/:id", () => {
     expect(res.status).toBe(404);
   });
 
-  it("deletes existing bookmark", async () => {
+  it("hides existing bookmark", async () => {
     mockGetBookmarkById.mockResolvedValueOnce({ id: "bm-1" });
     const res = await DELETE(deleteRequest(), { params });
     expect(res.status).toBe(200);
-    expect(mockDeleteBookmark).toHaveBeenCalledWith("bm-1");
+    expect(mockHideBookmark).toHaveBeenCalledWith("bm-1");
+    const json = await res.json();
+    expect(json.message).toBe("Bookmark hidden");
   });
 });
