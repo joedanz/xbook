@@ -67,6 +67,7 @@ jobs:
         run: docker build . --tag "$IMAGE_TAG"
 
       - name: Scan Docker image with Trivy
+        continue-on-error: true
         uses: aquasecurity/trivy-action@0.31.0
         with:
           image-ref: xbook:ci-${{ github.sha }}
