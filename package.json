@@ -28,7 +28,7 @@
     "better-sqlite3": "^12.8.0",
     "commander": "^14.0.3",
     "node-cron": "^3.0.3",
-    "resend": "^4.1.2"
+    "resend": "^6.10.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
