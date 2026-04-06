@@ -775,6 +775,7 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
 
   async getStats(): Promise<BookmarkStats> {
     const totalBookmarks = await this.getBookmarkCount();
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
 
     const folderCount = (
       this.db
@@ -796,10 +797,27 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
       .prepare(
         `SELECT COALESCE(folder_name, 'Unsorted') as folder, COUNT(*) as count
        FROM bookmarks
+       WHERE hidden = 0 AND deleted = 0
        GROUP BY folder_name
        ORDER BY count DESC`
       )
       .all() as { folder: string; count: number }[];
+
+    const thisWeek = (
+      this.db
+        .prepare(
+          "SELECT COUNT(*) as count FROM bookmarks WHERE hidden = 0 AND deleted = 0 AND synced_at >= ?"
+        )
+        .get(weekAgo) as { count: number }
+    ).count;
+
+    const needToRead = (
+      this.db
+        .prepare(
+          "SELECT COUNT(*) as count FROM bookmarks WHERE hidden = 0 AND deleted = 0 AND need_to_read = 1"
+        )
+        .get() as { count: number }
+    ).count;
 
     return {
       totalBookmarks,
@@ -807,6 +825,8 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
       lastSyncAt: lastSync?.synced_at || null,
       lastNewsletterAt: lastNewsletter?.sent_at || null,
       bookmarksByFolder,
+      bookmarksThisWeek: thisWeek,
+      needToReadCount: needToRead,
     };
   }
 

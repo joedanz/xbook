@@ -141,6 +141,8 @@ export interface BookmarkStats {
   lastSyncAt: string | null;
   lastNewsletterAt: string | null;
   bookmarksByFolder: { folder: string; count: number }[];
+  bookmarksThisWeek: number;
+  needToReadCount: number;
 }
 
 // --- Newsletter types ---

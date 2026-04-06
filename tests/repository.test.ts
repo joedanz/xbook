@@ -494,6 +494,29 @@ describe("SqliteBookmarkRepository", () => {
       expect(stats.lastSyncAt).not.toBeNull();
       expect(stats.bookmarksByFolder.length).toBeGreaterThanOrEqual(2);
     });
+
+    it("includes bookmarksThisWeek and needToReadCount", async () => {
+      await seedBookmarks();
+      await repo.setNeedToRead("t1", true);
+      await repo.setNeedToRead("t2", true);
+      const stats = await repo.getStats();
+      expect(stats.bookmarksThisWeek).toBe(4);
+      expect(stats.needToReadCount).toBe(2);
+    });
+
+    it("excludes hidden/deleted from bookmarksThisWeek, needToReadCount, and bookmarksByFolder", async () => {
+      await seedBookmarks();
+      await repo.setNeedToRead("t1", true);
+      await repo.setNeedToRead("t2", true);
+      await repo.hideBookmark("t1");
+      await repo.deleteBookmark("t3");
+      const stats = await repo.getStats();
+      expect(stats.totalBookmarks).toBe(2);
+      expect(stats.bookmarksThisWeek).toBe(2);
+      expect(stats.needToReadCount).toBe(1);
+      const tech = stats.bookmarksByFolder.find((f) => f.folder === "Tech");
+      expect(tech).toBeUndefined();
+    });
   });
 
   describe("syncHistory / newsletterHistory", () => {

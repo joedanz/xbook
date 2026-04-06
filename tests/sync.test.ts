@@ -97,7 +97,7 @@ function createMockRepo(): BookmarkRepository & { [key: string]: ReturnType<type
     getAllTags: vi.fn().mockResolvedValue([]),
     getSyncHistory: vi.fn().mockResolvedValue([]),
     getNewsletterHistory: vi.fn().mockResolvedValue([]),
-    getStats: vi.fn().mockResolvedValue({ totalBookmarks: 0, folderCount: 0, lastSyncAt: null, lastNewsletterAt: null, bookmarksByFolder: [] }),
+    getStats: vi.fn().mockResolvedValue({ totalBookmarks: 0, folderCount: 0, lastSyncAt: null, lastNewsletterAt: null, bookmarksByFolder: [], bookmarksThisWeek: 0, needToReadCount: 0 }),
     close: vi.fn(),
   };
 }
