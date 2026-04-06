@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { trackSearch } from "@/lib/analytics";
 
 export function SearchBar() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export function SearchBar() {
       role="search"
       onSubmit={(e) => {
         e.preventDefault();
+        if (value.trim()) trackSearch();
         submit(value);
       }}
       className="w-full sm:max-w-sm"

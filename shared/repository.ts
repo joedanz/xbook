@@ -11,6 +11,7 @@ import type {
   BookmarkStats,
   Tweet,
   User,
+  NewsletterBookmarkQuery,
 } from "./types";
 
 export interface BookmarkRepository {
@@ -30,7 +31,10 @@ export interface BookmarkRepository {
   upsertFolder(folder: BookmarkFolder): Promise<void>;
   getBookmarkCount(): Promise<number>;
   isNewBookmark(tweetId: string): Promise<boolean>;
+  /** @deprecated Use getNewsletterBookmarks instead */
   getNewBookmarks(limit?: number): Promise<StoredBookmark[]>;
+  getNewsletterBookmarks(options?: NewsletterBookmarkQuery & { limit?: number }): Promise<StoredBookmark[]>;
+  getNewsletterBookmarkCount(options?: NewsletterBookmarkQuery): Promise<number>;
   markNewslettered(tweetIds: string[]): Promise<void>;
   logSync(fetched: number, newCount: number): Promise<void>;
   logNewsletter(count: number): Promise<void>;

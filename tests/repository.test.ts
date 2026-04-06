@@ -622,4 +622,100 @@ describe("SqliteBookmarkRepository", () => {
       expect(result).toBe(false);
     });
   });
+
+  describe("newsletter starred/mustRead filters", () => {
+    async function seedFilteredBookmarks() {
+      const users = makeUsers(["u1", "Alice", "alice"]);
+
+      // t1: starred only
+      await repo.upsertBookmark({ id: "t1", text: "starred only" } as Tweet, users);
+      await repo.setStarred("t1", true);
+
+      // t2: must-read only
+      await repo.upsertBookmark({ id: "t2", text: "must read only" } as Tweet, users);
+      await repo.setNeedToRead("t2", true);
+
+      // t3: both starred and must-read
+      await repo.upsertBookmark({ id: "t3", text: "starred and must-read" } as Tweet, users);
+      await repo.setStarred("t3", true);
+      await repo.setNeedToRead("t3", true);
+
+      // t4: neither
+      await repo.upsertBookmark({ id: "t4", text: "plain bookmark" } as Tweet, users);
+
+      // t5: starred but hidden
+      await repo.upsertBookmark({ id: "t5", text: "starred hidden" } as Tweet, users);
+      await repo.setStarred("t5", true);
+      await repo.hideBookmark("t5");
+
+      // t6: must-read but deleted
+      await repo.upsertBookmark({ id: "t6", text: "must-read deleted" } as Tweet, users);
+      await repo.setNeedToRead("t6", true);
+      await repo.deleteBookmark("t6");
+    }
+
+    it("returns only starred bookmarks when starredOnly=true", async () => {
+      await seedFilteredBookmarks();
+      const results = await repo.getNewsletterBookmarks({ starredOnly: true });
+
+      const ids = results.map((b) => b.tweet_id).sort();
+      expect(ids).toEqual(["t1", "t3"]); // t5 excluded (hidden)
+    });
+
+    it("returns only must-read bookmarks when mustReadOnly=true", async () => {
+      await seedFilteredBookmarks();
+      const results = await repo.getNewsletterBookmarks({ mustReadOnly: true });
+
+      const ids = results.map((b) => b.tweet_id).sort();
+      expect(ids).toEqual(["t2", "t3"]); // t6 excluded (deleted)
+    });
+
+    it("returns only both-flagged bookmarks when both filters are true (AND logic)", async () => {
+      await seedFilteredBookmarks();
+      const results = await repo.getNewsletterBookmarks({ starredOnly: true, mustReadOnly: true });
+
+      expect(results).toHaveLength(1);
+      expect(results[0].tweet_id).toBe("t3");
+    });
+
+    it("getNewsletterBookmarkCount matches filtered results length", async () => {
+      await seedFilteredBookmarks();
+
+      const starredCount = await repo.getNewsletterBookmarkCount({ starredOnly: true });
+      const starredBookmarks = await repo.getNewsletterBookmarks({ starredOnly: true });
+      expect(starredCount).toBe(starredBookmarks.length);
+
+      const bothCount = await repo.getNewsletterBookmarkCount({ starredOnly: true, mustReadOnly: true });
+      expect(bothCount).toBe(1);
+    });
+
+    it("filters combine correctly with date range", async () => {
+      await seedFilteredBookmarks();
+      // Mark t1 as already sent
+      await repo.markNewslettered(["t1"]);
+
+      const results = await repo.getNewsletterBookmarks({ starredOnly: true });
+      const ids = results.map((b) => b.tweet_id);
+      // t1 excluded (already sent, default mode is unsent only)
+      expect(ids).toEqual(["t3"]);
+    });
+
+    it("hidden/deleted bookmarks excluded when filters active", async () => {
+      await seedFilteredBookmarks();
+
+      // t5 is starred+hidden, t6 is must-read+deleted
+      const starred = await repo.getNewsletterBookmarks({ starredOnly: true });
+      expect(starred.find((b) => b.tweet_id === "t5")).toBeUndefined();
+
+      const mustRead = await repo.getNewsletterBookmarks({ mustReadOnly: true });
+      expect(mustRead.find((b) => b.tweet_id === "t6")).toBeUndefined();
+    });
+
+    it("returns all bookmarks when no filters set (backward compat)", async () => {
+      await seedFilteredBookmarks();
+      const results = await repo.getNewsletterBookmarks();
+      // Should include t1-t4 (t5 hidden, t6 deleted)
+      expect(results).toHaveLength(4);
+    });
+  });
 });

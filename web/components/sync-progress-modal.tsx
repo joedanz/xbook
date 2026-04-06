@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2, CheckCircle2, XCircle, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackSyncStarted, trackSyncCompleted } from "@/lib/analytics";
 
 interface SyncProgressModalProps {
   open: boolean;
@@ -50,6 +51,8 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
 
     const controller = new AbortController();
     abortRef.current = controller;
+
+    trackSyncStarted();
 
     try {
       const res = await fetch("/api/sync", {
@@ -99,6 +102,7 @@ export function SyncProgressModal({ open, onOpenChange }: SyncProgressModalProps
             setRateLimitAttempt(`Attempt ${data.attempt} of ${data.maxRetries}`);
             setLines((prev) => [...prev, `Rate limited. Waiting ~${Math.ceil(data.waitSeconds / 60)}m ${data.waitSeconds % 60}s (attempt ${data.attempt}/${data.maxRetries})...`]);
           } else if (event === "done") {
+            trackSyncCompleted();
             setStatus("done");
             setSummary(data.message);
             toast.success(data.message);

@@ -124,3 +124,22 @@ export interface BookmarkStats {
   lastNewsletterAt: string | null;
   bookmarksByFolder: { folder: string; count: number }[];
 }
+
+// --- Newsletter types ---
+
+export type NewsletterDateRange =
+  | { mode: "all_unsent" }
+  | { mode: "since_last_send"; includePreviouslySent?: boolean }
+  | { mode: "last_n_weeks"; weeks: 1 | 2 | 3 | 4; includePreviouslySent?: boolean }
+  | { mode: "custom"; startDate: string; endDate: string; includePreviouslySent?: boolean };
+
+/** Filtering criteria for newsletter bookmark queries — used by repository and actions. */
+export interface NewsletterBookmarkQuery {
+  dateRange?: NewsletterDateRange;
+  starredOnly?: boolean;
+  mustReadOnly?: boolean;
+}
+
+export interface NewsletterOptions extends NewsletterBookmarkQuery {
+  includeImages?: boolean;
+}

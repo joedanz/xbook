@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { moveBookmark } from "@/lib/actions";
+import { trackMoveBookmark } from "@/lib/analytics";
 import { toast } from "sonner";
 
 interface Folder {
@@ -37,6 +38,7 @@ export function MoveFolderDialog({
     try {
       const result = await moveBookmark(tweetId, folderId, folderName);
       if (result.success) {
+        trackMoveBookmark();
         toast.success(
           folderName ? `Moved to ${folderName}` : "Removed from folder"
         );

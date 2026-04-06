@@ -13,7 +13,9 @@ import type {
   BookmarkStats,
   Tweet,
   User,
+  NewsletterBookmarkQuery,
 } from "./types";
+import { resolveNewsletterDates, formatSqliteDate, MAX_BOOKMARKS } from "./newsletter";
 
 /** Coerce SQLite 0/1 integers to booleans for starred, need_to_read, and hidden */
 function coerceBooleans(row: Record<string, unknown>): StoredBookmark {
@@ -266,6 +268,7 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
     return !row;
   }
 
+  /** @deprecated Use getNewsletterBookmarks instead */
   async getNewBookmarks(limit: number = 200): Promise<StoredBookmark[]> {
     return this.db
       .prepare(
@@ -273,6 +276,74 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
       )
       .all(limit)
       .map((r) => coerceBooleans(r as Record<string, unknown>));
+  }
+
+  async getNewsletterBookmarks(options?: NewsletterBookmarkQuery & { limit?: number }): Promise<StoredBookmark[]> {
+    const limit = options?.limit ?? MAX_BOOKMARKS;
+    const { where, params } = this.buildNewsletterWhere(options);
+
+    return this.db
+      .prepare(
+        `SELECT * FROM bookmarks ${where} ORDER BY synced_at DESC LIMIT ?`
+      )
+      .all(...params, limit)
+      .map((r) => coerceBooleans(r as Record<string, unknown>));
+  }
+
+  async getNewsletterBookmarkCount(options?: NewsletterBookmarkQuery): Promise<number> {
+    const { where, params } = this.buildNewsletterWhere(options);
+
+    const row = this.db
+      .prepare(`SELECT COUNT(*) as count FROM bookmarks ${where}`)
+      .get(...params) as { count: number };
+    return row.count;
+  }
+
+  private buildNewsletterWhere(options?: NewsletterBookmarkQuery): {
+    where: string;
+    params: unknown[];
+  } {
+    const dateRange = options?.dateRange;
+
+    // Fetch lastSendDate if needed
+    let lastSendDate: string | null = null;
+    if (dateRange?.mode === "since_last_send") {
+      const row = this.db
+        .prepare("SELECT sent_at FROM newsletter_log ORDER BY sent_at DESC LIMIT 1")
+        .get() as { sent_at: string } | undefined;
+      lastSendDate = row?.sent_at ?? null;
+    }
+
+    const resolved = resolveNewsletterDates(dateRange, lastSendDate);
+    const conditions: string[] = [
+      "(hidden = 0 OR hidden IS NULL)",
+      "(deleted = 0 OR deleted IS NULL)",
+    ];
+    const params: unknown[] = [];
+
+    if (!resolved.includeAlreadySent) {
+      conditions.push("newslettered_at IS NULL");
+    }
+
+    if (resolved.sinceDate) {
+      conditions.push("synced_at >= ?");
+      params.push(formatSqliteDate(resolved.sinceDate));
+    }
+
+    if (resolved.beforeDate) {
+      conditions.push("synced_at <= ?");
+      params.push(formatSqliteDate(resolved.beforeDate));
+    }
+
+    if (options?.starredOnly === true) {
+      conditions.push("starred = 1");
+    }
+    if (options?.mustReadOnly === true) {
+      conditions.push("need_to_read = 1");
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    return { where, params };
   }
 
   async markNewslettered(tweetIds: string[]): Promise<void> {

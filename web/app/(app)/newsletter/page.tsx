@@ -20,7 +20,7 @@ export default async function NewsletterPage() {
   const repo = getRepository(userId);
   const stats = await repo.getStats();
   const history = await repo.getNewsletterHistory(10);
-  const pendingBookmarks = await repo.getNewBookmarks();
+  const pendingCount = await repo.getNewsletterBookmarkCount();
 
   return (
     <div className="space-y-6">
@@ -63,12 +63,15 @@ export default async function NewsletterPage() {
         <CardHeader>
           <CardTitle>Send Newsletter</CardTitle>
           <CardDescription>
-            {pendingBookmarks.length} new bookmark
-            {pendingBookmarks.length !== 1 ? "s" : ""} since last newsletter
+            {pendingCount} new bookmark
+            {pendingCount !== 1 ? "s" : ""} since last newsletter
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <NewsletterActions hasBookmarks={pendingBookmarks.length > 0} />
+          <NewsletterActions
+            initialCount={pendingCount}
+            lastSendDate={stats.lastNewsletterAt}
+          />
         </CardContent>
       </Card>
 
