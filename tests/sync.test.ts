@@ -322,3 +322,110 @@ describe("syncBookmarks", () => {
     expect(result.articleImagesFound).toBe(0);
   });
 });
+
+describe("early termination (last_synced_tweet_id)", () => {
+  it("terminates early when last_synced_tweet_id is found on a page", async () => {
+    // getUserInfo returns "t2" for last_synced_tweet_id, "user123" for user_id
+    repo.getUserInfo.mockImplementation(async (key: string) =>
+      key === "last_synced_tweet_id" ? "t2" : "user123"
+    );
+
+    mockGetBookmarks
+      .mockResolvedValueOnce(
+        makeBookmarkResponse(
+          [{ id: "t1", text: "new tweet" }, { id: "t2", text: "last synced" }],
+          new Map()
+        )
+      );
+    repo.upsertBookmarksBatch.mockResolvedValueOnce({ imported: 1, skipped: 1 });
+
+    const result = await syncBookmarks(repo, "token");
+
+    expect(result.earlyTerminated).toBe(true);
+    expect(result.fetched).toBe(2);
+    expect(mockGetBookmarks).toHaveBeenCalledTimes(1); // Only 1 page, not more
+  });
+
+  it("does not terminate early on first sync (no last_synced_tweet_id)", async () => {
+    repo.getUserInfo.mockImplementation(async (key: string) =>
+      key === "last_synced_tweet_id" ? null : "user123"
+    );
+
+    mockGetBookmarks
+      .mockResolvedValueOnce(
+        makeBookmarkResponse([{ id: "t1", text: "page 1" }], new Map(), "next")
+      )
+      .mockResolvedValueOnce(
+        makeBookmarkResponse([{ id: "t2", text: "page 2" }], new Map())
+      );
+    repo.upsertBookmarksBatch
+      .mockResolvedValueOnce({ imported: 1, skipped: 0 })
+      .mockResolvedValueOnce({ imported: 1, skipped: 0 });
+
+    const result = await syncBookmarks(repo, "token");
+
+    expect(result.earlyTerminated).toBe(false);
+    expect(result.pages).toBe(2);
+    expect(mockGetBookmarks).toHaveBeenCalledTimes(2);
+  });
+
+  it("stores newest tweet ID at end of sync", async () => {
+    repo.getUserInfo.mockImplementation(async (key: string) =>
+      key === "last_synced_tweet_id" ? null : "user123"
+    );
+    mockGetBookmarks.mockResolvedValueOnce(
+      makeBookmarkResponse([{ id: "t99", text: "newest" }, { id: "t98", text: "older" }])
+    );
+    repo.upsertBookmarksBatch.mockResolvedValueOnce({ imported: 2, skipped: 0 });
+
+    await syncBookmarks(repo, "token");
+
+    expect(repo.setUserInfo).toHaveBeenCalledWith("last_synced_tweet_id", "t99");
+  });
+
+  it("full sync skips last_synced_tweet_id check", async () => {
+    repo.getUserInfo.mockImplementation(async (key: string) =>
+      key === "last_synced_tweet_id" ? "t1" : "user123"
+    );
+
+    mockGetBookmarks
+      .mockResolvedValueOnce(
+        makeBookmarkResponse([{ id: "t1", text: "known" }], new Map(), "next")
+      )
+      .mockResolvedValueOnce(
+        makeBookmarkResponse([{ id: "t2", text: "also known" }], new Map())
+      );
+    repo.upsertBookmarksBatch
+      .mockResolvedValueOnce({ imported: 0, skipped: 1 })
+      .mockResolvedValueOnce({ imported: 0, skipped: 1 });
+
+    const result = await syncBookmarks(repo, "token", undefined, undefined, { full: true });
+
+    expect(result.earlyTerminated).toBe(false);
+    expect(result.pages).toBe(2);
+    expect(mockGetBookmarks).toHaveBeenCalledTimes(2);
+  });
+
+  it("checks raw tweets for sync horizon (before hidden filtering)", async () => {
+    // last_synced_tweet_id is "t2", but t2 is hidden — should still trigger termination
+    repo.getUserInfo.mockImplementation(async (key: string) =>
+      key === "last_synced_tweet_id" ? "t2" : "user123"
+    );
+    repo.getHiddenTweetIds.mockResolvedValue(new Set(["t2"]));
+
+    mockGetBookmarks.mockResolvedValueOnce(
+      makeBookmarkResponse(
+        [{ id: "t1", text: "new" }, { id: "t2", text: "hidden but last synced" }],
+        new Map(),
+        "would-have-next-page"
+      )
+    );
+    repo.upsertBookmarksBatch.mockResolvedValueOnce({ imported: 1, skipped: 0 });
+
+    const result = await syncBookmarks(repo, "token");
+
+    expect(result.earlyTerminated).toBe(true);
+    expect(result.fetched).toBe(1); // t2 was filtered out by hidden
+    expect(mockGetBookmarks).toHaveBeenCalledTimes(1);
+  });
+});

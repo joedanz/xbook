@@ -76,7 +76,7 @@ describe("getBookmarks", () => {
     const url = new URL(mockFetch.mock.calls[0][0]);
     expect(url.pathname).toBe("/2/users/user123/bookmarks");
     expect(url.searchParams.get("max_results")).toBe("100");
-    expect(url.searchParams.get("tweet.fields")).toBe("created_at,author_id,attachments,entities");
+    expect(url.searchParams.get("tweet.fields")).toBe("created_at,author_id,attachments,entities,public_metrics");
     expect(url.searchParams.get("media.fields")).toBe("url,preview_image_url,type");
     expect(url.searchParams.get("expansions")).toContain("attachments.media_keys");
   });

@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     }
     if (url.searchParams.has("page_size")) query.pageSize = clampPageSize(url.searchParams.get("page_size")!);
 
-    const VALID_ORDER_BY = new Set(["created_at", "synced_at", "author_name"]);
+    const VALID_ORDER_BY = new Set(["created_at", "synced_at", "author_name", "like_count"]);
     const VALID_ORDER_DIR = new Set(["asc", "desc"]);
     if (url.searchParams.has("order_by")) {
       const ob = url.searchParams.get("order_by")!;

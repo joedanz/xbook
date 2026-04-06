@@ -1,0 +1,153 @@
+<h2>Newsletter Date Range — UI Design</h2>
+<p class="subtitle">How the date range selector fits into the existing Send Newsletter card</p>
+
+<div class="section">
+  <h3>Current UI (for reference)</h3>
+  <div class="mockup">
+    <div class="mockup-header">Newsletter Page — Current</div>
+    <div class="mockup-body" style="padding: 20px; font-family: system-ui, sans-serif;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+          <div style="color: #6b7280; font-size: 12px;">Status</div>
+          <div style="font-weight: 600; font-size: 14px;">Enabled</div>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+          <div style="color: #6b7280; font-size: 12px;">Frequency</div>
+          <div style="font-weight: 600; font-size: 14px;">Weekly (cron)</div>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+          <div style="color: #6b7280; font-size: 12px;">Last Sent</div>
+          <div style="font-weight: 600; font-size: 14px;">Mar 22, 2026</div>
+        </div>
+      </div>
+      <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+        <div style="font-weight: 600; margin-bottom: 4px;">Send Newsletter</div>
+        <div style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">24 new bookmarks since last newsletter</div>
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px;">
+          <input type="checkbox" checked disabled> Include images in email
+        </label>
+        <div style="display: flex; gap: 8px;">
+          <button style="background: #111; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 13px;">Send Now</button>
+          <button style="background: white; border: 1px solid #d1d5db; padding: 6px 14px; border-radius: 6px; font-size: 13px;">Preview</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Proposed UI — with Date Range Selector</h3>
+  <div class="mockup">
+    <div class="mockup-header">Newsletter Page — New Design</div>
+    <div class="mockup-body" style="padding: 20px; font-family: system-ui, sans-serif;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+          <div style="color: #6b7280; font-size: 12px;">Status</div>
+          <div style="font-weight: 600; font-size: 14px;">Enabled</div>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+          <div style="color: #6b7280; font-size: 12px;">Frequency</div>
+          <div style="font-weight: 600; font-size: 14px;">Weekly (cron)</div>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+          <div style="color: #6b7280; font-size: 12px;">Last Sent</div>
+          <div style="font-weight: 600; font-size: 14px;">Mar 22, 2026</div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+        <div style="font-weight: 600; margin-bottom: 4px;">Send Newsletter</div>
+        <div style="color: #6b7280; font-size: 13px; margin-bottom: 16px;">Select which bookmarks to include</div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.05em;">Date Range</div>
+          <div style="display: flex; gap: 4px; background: #f3f4f6; border-radius: 8px; padding: 3px;">
+            <button style="background: white; border: 1px solid #d1d5db; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">Since Last Send</button>
+            <button style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: #6b7280;">Last N Weeks</button>
+            <button style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: #6b7280;">Custom Dates</button>
+            <button style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: #6b7280;">All Unsent</button>
+          </div>
+        </div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #15803d; margin-bottom: 16px;">
+          24 bookmarks since Mar 22, 2026
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+            <input type="checkbox" checked disabled> Include images in email
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ca3af;">
+            <input type="checkbox" disabled> Include previously sent bookmarks
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button style="background: #111; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 13px;">Send Now</button>
+          <button style="background: white; border: 1px solid #d1d5db; padding: 6px 14px; border-radius: 6px; font-size: 13px;">Preview</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Conditional Sub-options</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div class="mockup">
+      <div class="mockup-header">When "Last N Weeks" selected</div>
+      <div class="mockup-body" style="padding: 16px; font-family: system-ui, sans-serif;">
+        <div style="display: flex; gap: 4px; background: #f3f4f6; border-radius: 8px; padding: 3px; margin-bottom: 12px;">
+          <button style="background: transparent; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; color: #6b7280;">Since Last</button>
+          <button style="background: white; border: 1px solid #d1d5db; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">N Weeks</button>
+          <button style="background: transparent; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; color: #6b7280;">Custom</button>
+          <button style="background: transparent; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; color: #6b7280;">All</button>
+        </div>
+        <select style="border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 10px; font-size: 13px; width: 100%; margin-bottom: 12px;">
+          <option>1 week</option>
+          <option selected>2 weeks</option>
+          <option>3 weeks</option>
+          <option>4 weeks</option>
+        </select>
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #1d4ed8;">
+          38 bookmarks in last 2 weeks
+        </div>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">When "Custom Dates" selected</div>
+      <div class="mockup-body" style="padding: 16px; font-family: system-ui, sans-serif;">
+        <div style="display: flex; gap: 4px; background: #f3f4f6; border-radius: 8px; padding: 3px; margin-bottom: 12px;">
+          <button style="background: transparent; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; color: #6b7280;">Since Last</button>
+          <button style="background: transparent; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; color: #6b7280;">N Weeks</button>
+          <button style="background: white; border: 1px solid #d1d5db; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">Custom</button>
+          <button style="background: transparent; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; color: #6b7280;">All</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+          <div>
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">From</div>
+            <input type="date" value="2026-03-15" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 10px; font-size: 13px; width: 100%;">
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">To</div>
+            <input type="date" value="2026-03-29" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 10px; font-size: 13px; width: 100%;">
+          </div>
+        </div>
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #1d4ed8;">
+          15 bookmarks in selected range
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Key Behaviors</h3>
+  <ul style="font-size: 14px; line-height: 1.8; color: #374151;">
+    <li><strong>Segmented control</strong> for mode selection — fits existing shadcn aesthetic</li>
+    <li><strong>"Include previously sent"</strong> greyed out for "All Unsent" and "Since Last Send"</li>
+    <li><strong>Dynamic bookmark count</strong> updates when mode changes (via server action)</li>
+    <li><strong>Default: "Since Last Send"</strong> — most useful starting point</li>
+    <li>Uses native date inputs — no extra dependencies needed</li>
+  </ul>
+</div>

@@ -1,0 +1,61 @@
+<h2>Pricing Page — Implementation Complete</h2>
+<p class="subtitle">Two commits landed on main. Here's what was built:</p>
+
+<div class="section">
+  <h3>Commits</h3>
+  <div style="font-family: monospace; font-size: 13px; background: var(--bg-secondary); border-radius: 8px; padding: 16px; line-height: 1.8;">
+    <div><span style="color: var(--text-muted);">3643907</span> feat: update pricing page with cloud pricing ($8/mo, $5/mo founding member)</div>
+    <div><span style="color: var(--text-muted);">d6a718d</span> fix: pricing page a11y (aria-pressed toggle) and clean up dead variables</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Files Changed</h3>
+  <div style="font-family: monospace; font-size: 13px; background: var(--bg-secondary); border-radius: 8px; padding: 16px; line-height: 1.8;">
+    <div style="color: #22c55e;">+ web/app/(marketing)/pricing/layout.tsx</div>
+    <div style="color: #f59e0b;">~ web/app/(marketing)/pricing/page.tsx</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>What's on the Page</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 16px;">
+      <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;">Self-Hosted Card</div>
+      <div style="font-size: 28px; font-weight: bold;">Free</div>
+      <div style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">5 features listed</div>
+      <div style="margin-top: 8px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; text-align: center; font-size: 13px;">Get Started → GitHub</div>
+    </div>
+    <div style="background: var(--bg-secondary); border: 2px solid var(--text-primary); border-radius: 8px; padding: 16px;">
+      <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;">Cloud Card (highlighted)</div>
+      <div><span style="text-decoration: line-through; color: var(--text-muted);">$8/mo</span> <span style="font-size: 28px; font-weight: bold;">$5</span><span style="color: var(--text-muted);">/mo</span></div>
+      <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">Founding Member · First 200 · Limited</div>
+      <div style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">7 features listed</div>
+      <div style="margin-top: 8px; padding: 6px 12px; background: var(--text-primary); color: var(--bg-primary); border-radius: 6px; text-align: center; font-size: 13px;">Join Waitlist</div>
+    </div>
+  </div>
+  <div style="text-align: center; margin-top: 16px; color: var(--text-muted); font-size: 13px;">
+    Lifetime access · <strong style="color: var(--text-primary);">$149</strong> · 50 spots · <span style="text-decoration: underline;">Join waitlist</span>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Features</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 8px;">
+    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 20px; margin-bottom: 4px;">🔄</div>
+      <div style="font-size: 13px; font-weight: 600;">Monthly/Annual Toggle</div>
+      <div style="font-size: 12px; color: var(--text-muted);">with aria-pressed a11y</div>
+    </div>
+    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 20px; margin-bottom: 4px;">❓</div>
+      <div style="font-size: 13px; font-weight: 600;">8 FAQs</div>
+      <div style="font-size: 12px; color: var(--text-muted);">2 new (Founding, Lifetime)</div>
+    </div>
+    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 20px; margin-bottom: 4px;">🔒</div>
+      <div style="font-size: 13px; font-weight: 600;">OSS Excluded</div>
+      <div style="font-size: 12px; color: var(--text-muted);">Already in sync-config</div>
+    </div>
+  </div>
+</div>

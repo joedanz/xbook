@@ -1,0 +1,60 @@
+<h2>Pricing Page Layout</h2>
+<p class="subtitle">How should we structure the pricing cards with the new $8/mo + founding member + lifetime offers?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Two Cards + Banner</h3>
+      <p>Keep the current 2-card layout (Self-Hosted Free vs Cloud $8/mo) with annual toggle. Add a highlighted "Founding Member" banner above the Cloud card showing the $5/mo deal for first 100. Lifetime deal as a separate callout below the cards.</p>
+      <div style="margin-top: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 8px; font-size: 13px; font-family: monospace; white-space: pre; line-height: 1.6;">┌─────────────────────────────────────────┐
+│  🎉 Founding Member: $5/mo (first 100)  │
+└─────────────────────────────────────────┘
+
+ ┌──────────────┐  ┌──────────────┐
+ │  Self-Hosted  │  │    Cloud     │
+ │    FREE       │  │   $8/mo      │
+ │              │  │  ($6/mo yr)  │
+ │  [GitHub →]  │  │ [Waitlist →] │
+ └──────────────┘  └──────────────┘
+
+ ┌─────────────────────────────────┐
+ │  Lifetime: $149 (50 spots)     │
+ └─────────────────────────────────┘</div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Three Cards</h3>
+      <p>Three equal cards: Self-Hosted (Free), Cloud ($8/mo), and Founding Member ($5/mo — highlighted as recommended). Lifetime deal as a subtle row below. Clean and lets each offer breathe.</p>
+      <div style="margin-top: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 8px; font-size: 13px; font-family: monospace; white-space: pre; line-height: 1.6;"> ┌────────────┐ ┌────────────┐ ┌────────────┐
+ │ Self-Host   │ │⭐ Founding │ │   Cloud    │
+ │   FREE      │ │  $5/mo     │ │  $8/mo     │
+ │             │ │ (first 100)│ │ ($6/mo yr) │
+ │ [GitHub →]  │ │[Waitlist →]│ │[Waitlist →]│
+ └────────────┘ └────────────┘ └────────────┘
+
+    Lifetime access: $149 — 50 spots only</div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Two Cards + Inline Founding Price</h3>
+      <p>Keep 2 cards (Self-Hosted vs Cloud). Cloud card shows the $8/mo price with a strikethrough-style "Founding Member: $5/mo" shown as a limited-time offer inside the same card. Annual toggle. Lifetime as a small link/callout beneath.</p>
+      <div style="margin-top: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 8px; font-size: 13px; font-family: monospace; white-space: pre; line-height: 1.6;"> ┌──────────────┐  ┌──────────────────┐
+ │  Self-Hosted  │  │      Cloud       │
+ │    FREE       │  │                  │
+ │              │  │  ~~$8/mo~~       │
+ │              │  │  $5/mo founding  │
+ │              │  │  (72 of 100 left)│
+ │  [GitHub →]  │  │  [Waitlist →]    │
+ └──────────────┘  └──────────────────┘
+
+       Lifetime: $149 · 50 spots</div>
+    </div>
+  </div>
+</div>

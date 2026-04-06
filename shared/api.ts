@@ -72,7 +72,7 @@ export async function getBookmarks(
   options?: ApiCallOptions
 ): Promise<BookmarkResponse> {
   const params: Record<string, string> = {
-    "tweet.fields": "created_at,author_id,attachments,entities",
+    "tweet.fields": "created_at,author_id,attachments,entities,public_metrics",
     expansions: "author_id,attachments.media_keys",
     "user.fields": "name,username",
     "media.fields": "url,preview_image_url,type",
@@ -102,6 +102,13 @@ export async function getBookmarks(
     attachments?: { media_keys?: string[] };
     entities?: { urls?: UrlEntity[] };
     article?: { title?: string };
+    public_metrics?: {
+      like_count?: number;
+      retweet_count?: number;
+      reply_count?: number;
+      quote_count?: number;
+      impression_count?: number;
+    };
   }
 
   const data = (await apiGet(`/users/${userId}/bookmarks`, accessToken, params, 3, options)) as {
@@ -175,6 +182,11 @@ export async function getBookmarks(
       url_description,
       url_image,
       expanded_url,
+      like_count: t.public_metrics?.like_count,
+      retweet_count: t.public_metrics?.retweet_count,
+      reply_count: t.public_metrics?.reply_count,
+      quote_count: t.public_metrics?.quote_count,
+      impression_count: t.public_metrics?.impression_count,
     };
   });
 

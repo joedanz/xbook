@@ -11,11 +11,17 @@ export type { SyncResult };
 /** Safety limit for pagination loops to prevent infinite iteration on malformed tokens. */
 const MAX_PAGES = 200;
 
+export interface SyncOptions {
+  /** When true, skip early termination and paginate through all bookmarks. */
+  full?: boolean;
+}
+
 export async function syncBookmarks(
   repo: BookmarkRepository,
   accessToken: string,
   onProgress?: (message: string) => void,
-  onRateLimit?: (waitSeconds: number, attempt: number, maxRetries: number) => void
+  onRateLimit?: (waitSeconds: number, attempt: number, maxRetries: number) => void,
+  options?: SyncOptions
 ): Promise<SyncResult> {
   function log(msg: string) {
     console.log(msg);
@@ -40,6 +46,11 @@ export async function syncBookmarks(
   let newCount = 0;
   const seen = new Set<string>();
   const paginationLog: string[] = [];
+  let earlyTerminated = false;
+
+  // Load the last synced tweet ID for incremental sync
+  const lastSyncedTweetId = options?.full ? null : await repo.getUserInfo("last_synced_tweet_id");
+  let newestTweetId: string | undefined;
 
   // Fetch main bookmarks with pagination
   let nextToken: string | undefined;
@@ -56,6 +67,15 @@ export async function syncBookmarks(
       (response.nextToken ? `, next_token: ${response.nextToken.slice(0, 20)}...` : ", no next_token (last page)");
     log(`Bookmark ${logMsg}`);
     paginationLog.push(logMsg);
+
+    // Track the newest tweet ID from the first page (X API returns reverse-chronological)
+    if (!newestTweetId && response.tweets.length > 0) {
+      newestTweetId = response.tweets[0].id;
+    }
+
+    // Check for sync horizon BEFORE hidden filtering (on raw API response)
+    const reachedHorizon = lastSyncedTweetId && response.tweets.some(t => t.id === lastSyncedTweetId);
+
     // Deduplicate within this page against previously seen tweets
     const uniqueTweets = response.tweets.filter(tweet => {
       if (seen.has(tweet.id)) return false;
@@ -71,10 +91,23 @@ export async function syncBookmarks(
       fetched += visibleTweets.length;
       newCount += result.imported;
     }
+
+    // Early termination: stop after processing the page that contains our sync horizon
+    if (reachedHorizon) {
+      earlyTerminated = true;
+      log("Reached last synced bookmark — stopping early (use ?full=true for full sync)");
+      break;
+    }
+
     nextToken = response.nextToken;
   } while (nextToken);
   const removedCount = 0;
-  log(`Bookmark sync complete: ${fetched} total across ${page} page(s)`);
+  log(`Bookmark sync complete: ${fetched} total across ${page} page(s)${earlyTerminated ? " (early termination)" : ""}`);
+
+  // Store the newest tweet ID for next incremental sync
+  if (newestTweetId) {
+    await repo.setUserInfo("last_synced_tweet_id", newestTweetId);
+  }
 
   // Fetch folders and assign bookmarks to them.
   // The folder bookmarks endpoint only returns tweet IDs (no expansions),
@@ -137,5 +170,5 @@ export async function syncBookmarks(
   }
 
   await repo.logSync(fetched, newCount);
-  return { fetched, newCount, removedCount, foldersFound, folderAssignments, articleImagesFound: articlesEnriched, pages: page, paginationLog };
+  return { fetched, newCount, removedCount, foldersFound, folderAssignments, articleImagesFound: articlesEnriched, pages: page, paginationLog, earlyTerminated };
 }

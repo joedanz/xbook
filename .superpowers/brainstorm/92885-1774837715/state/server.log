@@ -1,0 +1,3 @@
+{"type":"server-started","port":57156,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:57156","screen_dir":"/Users/danziger/code/xbook-cloud/.superpowers/brainstorm/92885-1774837715/content","state_dir":"/Users/danziger/code/xbook-cloud/.superpowers/brainstorm/92885-1774837715/state"}
+{"type":"screen-added","file":"/Users/danziger/code/xbook-cloud/.superpowers/brainstorm/92885-1774837715/content/newsletter-date-range-ui.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -13,6 +13,11 @@ export interface Tweet {
   url_description?: string;
   url_image?: string;
   expanded_url?: string;
+  like_count?: number;
+  retweet_count?: number;
+  reply_count?: number;
+  quote_count?: number;
+  impression_count?: number;
 }
 
 export interface User {
@@ -61,6 +66,11 @@ export interface StoredBookmark {
   need_to_read: boolean;
   hidden: boolean;
   deleted: boolean;
+  like_count: number | null;
+  retweet_count: number | null;
+  reply_count: number | null;
+  quote_count: number | null;
+  impression_count: number | null;
 }
 
 // --- Sync types ---
@@ -74,6 +84,7 @@ export interface SyncResult {
   articleImagesFound: number;
   pages: number;
   paginationLog: string[];
+  earlyTerminated: boolean;
 }
 
 // --- Web query types ---
@@ -92,7 +103,7 @@ export interface BookmarkQuery {
   deleted?: boolean;
   page?: number;
   pageSize?: number;
-  orderBy?: "created_at" | "synced_at" | "author_name";
+  orderBy?: "created_at" | "synced_at" | "author_name" | "like_count";
   orderDir?: "asc" | "desc";
 }
 
