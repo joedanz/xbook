@@ -1,6 +1,13 @@
 // ABOUTME: Shared type definitions used by both the CLI and web interface.
 // ABOUTME: Extracted from shared/api.ts and shared/repository.ts to avoid duplication.
 
+// --- Chrome sync types ---
+
+export interface ChromeCookies {
+  ct0: string; // CSRF token
+  authToken: string; // Session auth token
+}
+
 // --- X API types (originally from shared/api.ts) ---
 
 export interface Tweet {

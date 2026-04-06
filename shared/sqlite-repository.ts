@@ -131,6 +131,21 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
         "ALTER TABLE bookmarks ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0"
       );
     }
+    if (!columnNames.has("like_count")) {
+      this.db.exec("ALTER TABLE bookmarks ADD COLUMN like_count INTEGER");
+    }
+    if (!columnNames.has("retweet_count")) {
+      this.db.exec("ALTER TABLE bookmarks ADD COLUMN retweet_count INTEGER");
+    }
+    if (!columnNames.has("reply_count")) {
+      this.db.exec("ALTER TABLE bookmarks ADD COLUMN reply_count INTEGER");
+    }
+    if (!columnNames.has("quote_count")) {
+      this.db.exec("ALTER TABLE bookmarks ADD COLUMN quote_count INTEGER");
+    }
+    if (!columnNames.has("impression_count")) {
+      this.db.exec("ALTER TABLE bookmarks ADD COLUMN impression_count INTEGER");
+    }
     // Create indexes (IF NOT EXISTS is safe for repeated runs)
     const indexStatements = [
       "CREATE INDEX IF NOT EXISTS idx_bookmarks_synced_at ON bookmarks(synced_at)",
@@ -164,8 +179,8 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
 
       this.db
         .prepare(
-          `INSERT INTO bookmarks (tweet_id, text, author_id, author_name, author_username, created_at, folder_id, folder_name, media_url, url_title, url_description, url_image, expanded_url)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `INSERT INTO bookmarks (tweet_id, text, author_id, author_name, author_username, created_at, folder_id, folder_name, media_url, url_title, url_description, url_image, expanded_url, like_count, retweet_count, reply_count, quote_count, impression_count)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(tweet_id) DO UPDATE SET
            folder_id = COALESCE(excluded.folder_id, folder_id),
            folder_name = COALESCE(excluded.folder_name, folder_name),
@@ -173,7 +188,12 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
            url_title = COALESCE(excluded.url_title, url_title),
            url_description = COALESCE(excluded.url_description, url_description),
            url_image = COALESCE(excluded.url_image, url_image),
-           expanded_url = COALESCE(excluded.expanded_url, expanded_url)`
+           expanded_url = COALESCE(excluded.expanded_url, expanded_url),
+           like_count = COALESCE(excluded.like_count, like_count),
+           retweet_count = COALESCE(excluded.retweet_count, retweet_count),
+           reply_count = COALESCE(excluded.reply_count, reply_count),
+           quote_count = COALESCE(excluded.quote_count, quote_count),
+           impression_count = COALESCE(excluded.impression_count, impression_count)`
         )
         .run(
           tweet.id,
@@ -188,7 +208,12 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
           tweet.url_title || null,
           tweet.url_description || null,
           tweet.url_image || null,
-          tweet.expanded_url || null
+          tweet.expanded_url || null,
+          tweet.like_count ?? null,
+          tweet.retweet_count ?? null,
+          tweet.reply_count ?? null,
+          tweet.quote_count ?? null,
+          tweet.impression_count ?? null
         );
 
       return !existing;
@@ -205,40 +230,49 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
     let skipped = 0;
 
     this.db.transaction(() => {
+      const selectStmt = this.db.prepare("SELECT 1 FROM bookmarks WHERE tweet_id = ?");
+      const upsertStmt = this.db.prepare(
+        `INSERT INTO bookmarks (tweet_id, text, author_id, author_name, author_username, created_at, folder_id, folder_name, media_url, url_title, url_description, url_image, expanded_url, like_count, retweet_count, reply_count, quote_count, impression_count)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(tweet_id) DO UPDATE SET
+           folder_id = COALESCE(excluded.folder_id, folder_id),
+           folder_name = COALESCE(excluded.folder_name, folder_name),
+           media_url = COALESCE(excluded.media_url, media_url),
+           url_title = COALESCE(excluded.url_title, url_title),
+           url_description = COALESCE(excluded.url_description, url_description),
+           url_image = COALESCE(excluded.url_image, url_image),
+           expanded_url = COALESCE(excluded.expanded_url, expanded_url),
+           like_count = COALESCE(excluded.like_count, like_count),
+           retweet_count = COALESCE(excluded.retweet_count, retweet_count),
+           reply_count = COALESCE(excluded.reply_count, reply_count),
+           quote_count = COALESCE(excluded.quote_count, quote_count),
+           impression_count = COALESCE(excluded.impression_count, impression_count)`
+      );
+
       for (const tweet of tweets) {
         const user = tweet.author_id ? users.get(tweet.author_id) : undefined;
-        const existing = this.db
-          .prepare("SELECT 1 FROM bookmarks WHERE tweet_id = ?")
-          .get(tweet.id);
+        const existing = selectStmt.get(tweet.id);
 
-        this.db
-          .prepare(
-            `INSERT INTO bookmarks (tweet_id, text, author_id, author_name, author_username, created_at, folder_id, folder_name, media_url, url_title, url_description, url_image, expanded_url)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-             ON CONFLICT(tweet_id) DO UPDATE SET
-               folder_id = COALESCE(excluded.folder_id, folder_id),
-               folder_name = COALESCE(excluded.folder_name, folder_name),
-               media_url = COALESCE(excluded.media_url, media_url),
-               url_title = COALESCE(excluded.url_title, url_title),
-               url_description = COALESCE(excluded.url_description, url_description),
-               url_image = COALESCE(excluded.url_image, url_image),
-               expanded_url = COALESCE(excluded.expanded_url, expanded_url)`
-          )
-          .run(
-            tweet.id,
-            tweet.text,
-            tweet.author_id || null,
-            user?.name || null,
-            user?.username || null,
-            tweet.created_at || null,
-            folderId || null,
-            folderName || null,
-            tweet.media_url || null,
-            tweet.url_title || null,
-            tweet.url_description || null,
-            tweet.url_image || null,
-            tweet.expanded_url || null
-          );
+        upsertStmt.run(
+          tweet.id,
+          tweet.text,
+          tweet.author_id || null,
+          user?.name || null,
+          user?.username || null,
+          tweet.created_at || null,
+          folderId || null,
+          folderName || null,
+          tweet.media_url || null,
+          tweet.url_title || null,
+          tweet.url_description || null,
+          tweet.url_image || null,
+          tweet.expanded_url || null,
+          tweet.like_count ?? null,
+          tweet.retweet_count ?? null,
+          tweet.reply_count ?? null,
+          tweet.quote_count ?? null,
+          tweet.impression_count ?? null
+        );
 
         if (!existing) imported++;
         else skipped++;
@@ -506,7 +540,7 @@ export class SqliteBookmarkRepository implements BookmarkRepository {
 
     const where =
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-    const ALLOWED_ORDER_BY = new Set(["created_at", "synced_at", "author_name"]);
+    const ALLOWED_ORDER_BY = new Set(["created_at", "synced_at", "author_name", "like_count"]);
     const ALLOWED_ORDER_DIR = new Set(["asc", "desc"]);
     const orderBy = ALLOWED_ORDER_BY.has(query.orderBy || "") ? query.orderBy! : "synced_at";
     const orderDir = ALLOWED_ORDER_DIR.has(query.orderDir || "") ? query.orderDir! : "desc";

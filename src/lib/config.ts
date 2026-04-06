@@ -2,13 +2,15 @@
 // ABOUTME: Supports env var overrides and config resolution order.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, chmodSync } from "fs";
-import { resolve, dirname } from "path";
+import { resolve } from "path";
 import { homedir } from "os";
 
 export interface CliConfig {
   apiKey?: string;
   apiUrl: string;
   outputJson: boolean;
+  syncMethod?: "chrome" | "api";
+  dbPath?: string;
 }
 
 const CONFIG_DIR = resolve(homedir(), ".xbook");
@@ -47,6 +49,9 @@ export function clearConfig(): void {
 export function resolveConfig(overrides?: Partial<CliConfig>): CliConfig {
   const file = loadConfigFile();
 
+  const syncMethodEnv = process.env.XBOOK_SYNC_METHOD;
+  const validSyncMethods = ["chrome", "api"] as const;
+
   return {
     apiKey:
       overrides?.apiKey ||
@@ -63,5 +68,17 @@ export function resolveConfig(overrides?: Partial<CliConfig>): CliConfig {
       (process.env.XBOOK_OUTPUT === "json" || undefined) ??
       file.outputJson ??
       false,
+    syncMethod:
+      overrides?.syncMethod ||
+      (syncMethodEnv && validSyncMethods.includes(syncMethodEnv as typeof validSyncMethods[number])
+        ? (syncMethodEnv as "chrome" | "api")
+        : undefined) ||
+      file.syncMethod ||
+      undefined,
+    dbPath:
+      overrides?.dbPath ||
+      process.env.XBOOK_DB_PATH ||
+      file.dbPath ||
+      undefined,
   };
 }
