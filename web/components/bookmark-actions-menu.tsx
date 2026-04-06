@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { hideBookmark, unhideBookmark, deleteBookmark, undeleteBookmark } from "@/lib/actions";
+import { trackDeleteBookmark, trackHideBookmark } from "@/lib/analytics";
 import { toast } from "sonner";
 
 export function BookmarkActionsMenu({
@@ -46,6 +47,7 @@ export function BookmarkActionsMenu({
         );
       } else {
         const result = await hideBookmark(tweetId);
+        if (result.success) trackHideBookmark();
         toast[result.success ? "success" : "error"](
           result.success ? "Bookmark hidden" : "Failed to hide bookmark"
         );
@@ -61,6 +63,7 @@ export function BookmarkActionsMenu({
     setPending(true);
     try {
       const result = await deleteBookmark(tweetId);
+      if (result.success) trackDeleteBookmark();
       toast[result.success ? "success" : "error"](
         result.success ? "Bookmark deleted" : "Failed to delete bookmark"
       );

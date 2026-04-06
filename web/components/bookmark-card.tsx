@@ -12,6 +12,7 @@ import { NoteEditor } from "@/components/note-editor";
 import { TagInput } from "@/components/tag-input";
 import { FormattedDate } from "@/components/formatted-date";
 import { toggleStarred, toggleNeedToRead } from "@/lib/actions";
+import { trackStarBookmark } from "@/lib/analytics";
 import { tweetUrl } from "@shared/urls";
 
 export function BookmarkCard({
@@ -37,7 +38,11 @@ export function BookmarkCard({
     setIsStarred(!prev);
     startTransition(async () => {
       const result = await toggleStarred(bookmark.tweet_id);
-      if (!result.success) setIsStarred(prev);
+      if (result.success) {
+        trackStarBookmark();
+      } else {
+        setIsStarred(prev);
+      }
     });
   }
 

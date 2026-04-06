@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { getRepository } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { checkRateLimit, ACTION_RATE_LIMIT } from "@/lib/rate-limit";
-import type { Tweet, User } from "@shared/types";
+import type { Tweet, User, NewsletterOptions, NewsletterBookmarkQuery } from "@shared/types";
+import { validateDateRange, MAX_BOOKMARKS } from "@shared/newsletter";
 
 const MAX_TWEET_ID_LEN = 30;
 const MAX_TAG_LEN = 100;
@@ -184,22 +185,29 @@ export async function toggleNeedToRead(tweetId: string) {
   return { success: true, needToRead };
 }
 
-export async function sendNewsletter() {
+export async function sendNewsletter(options?: NewsletterOptions) {
   const { userId } = await requireUser();
   const { checkRateLimit, NEWSLETTER_RATE_LIMIT } = await import("@/lib/rate-limit");
   const rl = await checkRateLimit(`newsletter:${userId}`, NEWSLETTER_RATE_LIMIT);
   if (!rl.allowed) {
     return { success: false, error: "Too many requests. Please wait before sending another newsletter." };
   }
+
+  const validationError = validateDateRange(options?.dateRange);
+  if (validationError) return { success: false, error: validationError };
+
   const repo = getRepository();
-  const bookmarks = await repo.getNewBookmarks();
+  const bookmarks = await repo.getNewsletterBookmarks({
+    ...options,
+    limit: MAX_BOOKMARKS,
+  });
 
   if (bookmarks.length === 0) {
     return { success: true, message: "No new bookmarks to send", count: 0 };
   }
 
   const { renderNewsletter } = await import("@shared/newsletter");
-  const { subject, html } = renderNewsletter(bookmarks);
+  const { subject, html } = renderNewsletter(bookmarks, { includeImages: options?.includeImages });
 
   const resendApiKey = process.env.RESEND_API_KEY;
   if (!resendApiKey) {
@@ -237,21 +245,46 @@ export async function sendNewsletter() {
   return { success: true, message: `Newsletter sent with ${bookmarks.length} bookmarks`, count: bookmarks.length };
 }
 
-export async function previewNewsletter() {
+export async function previewNewsletter(options?: NewsletterOptions) {
   const { userId } = await requireUser();
   const rl = await checkRateLimit(`action:${userId}`, ACTION_RATE_LIMIT);
   if (!rl.allowed) return { success: false, message: null, count: 0, html: null, error: "Too many requests" };
+
+  const validationError = validateDateRange(options?.dateRange);
+  if (validationError) return { success: false, message: null, count: 0, html: null, error: validationError };
+
   const repo = getRepository();
-  const bookmarks = await repo.getNewBookmarks();
+  const bookmarks = await repo.getNewsletterBookmarks({
+    ...options,
+    limit: MAX_BOOKMARKS,
+  });
 
   if (bookmarks.length === 0) {
     return { success: true, message: "No new bookmarks to preview", count: 0, html: null, error: null };
   }
 
   const { renderNewsletter } = await import("@shared/newsletter");
-  const { subject, html } = renderNewsletter(bookmarks);
+  const { subject, html } = renderNewsletter(bookmarks, { includeImages: options?.includeImages });
 
   return { success: true, subject, count: bookmarks.length, html, error: null };
+}
+
+export async function getNewsletterBookmarkCount(options?: NewsletterBookmarkQuery) {
+  const { userId } = await requireUser();
+  const rl = await checkRateLimit(`action:${userId}`, ACTION_RATE_LIMIT);
+  if (!rl.allowed) return { success: false, count: 0, error: "Too many requests" };
+
+  const validationError = validateDateRange(options?.dateRange);
+  if (validationError) return { success: false, count: 0, error: validationError };
+
+  try {
+    const repo = getRepository();
+    const count = await repo.getNewsletterBookmarkCount(options);
+    return { success: true, count, error: null };
+  } catch (err) {
+    console.error("getNewsletterBookmarkCount failed:", err);
+    return { success: false, count: 0, error: "Failed to load bookmark count" };
+  }
 }
 
 export async function importBookmarks(

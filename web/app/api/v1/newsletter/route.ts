@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import { authenticateApiRequest } from "@/lib/api-auth";
 import { getRepository } from "@/lib/db";
 import { checkRateLimit, rateLimitResponse, getClientIp, API_RATE_LIMIT, NEWSLETTER_RATE_LIMIT } from "@/lib/rate-limit";
+import { parseDateRange, validateDateRange, MAX_BOOKMARKS } from "@shared/newsletter";
+import type { NewsletterDateRange } from "@shared/types";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -35,16 +37,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
     const dryRun = body.dry_run === true;
+    const includeImages = body.include_images !== false;
+
+    // Parse and validate date_range
+    let dateRange: NewsletterDateRange | undefined;
+    if (body.date_range) {
+      dateRange = parseDateRange(body);
+      if (!dateRange) {
+        return NextResponse.json({ error: "Invalid date_range parameters" }, { status: 400 });
+      }
+      const validationError = validateDateRange(dateRange);
+      if (validationError) {
+        return NextResponse.json({ error: validationError }, { status: 400 });
+      }
+    }
 
     const repo = getRepository(auth.userId);
-    const bookmarks = await repo.getNewBookmarks(200);
+    const bookmarks = await repo.getNewsletterBookmarks({ dateRange, limit: MAX_BOOKMARKS });
 
     if (bookmarks.length === 0) {
       return NextResponse.json({ success: true, message: "No new bookmarks to send", count: 0 });
     }
 
     const { renderNewsletter } = await import("@shared/newsletter");
-    const { subject, html } = renderNewsletter(bookmarks);
+    const { subject, html } = renderNewsletter(bookmarks, { includeImages });
 
     if (dryRun) {
       return NextResponse.json({ success: true, subject, count: bookmarks.length, html });

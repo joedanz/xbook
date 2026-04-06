@@ -20,6 +20,8 @@ const mockRepo = {
   toggleStarred: vi.fn(),
   toggleNeedToRead: vi.fn(),
   getNewBookmarks: vi.fn(),
+  getNewsletterBookmarks: vi.fn(),
+  getNewsletterBookmarkCount: vi.fn(),
   markNewslettered: vi.fn(),
   logNewsletter: vi.fn(),
 };
@@ -43,11 +45,15 @@ vi.mock("@/lib/rate-limit", async () => {
   };
 });
 
-// Mock newsletter HTML renderer
+// Mock newsletter HTML renderer — preserve validateDateRange, MAX_BOOKMARKS
 const mockRenderNewsletter = vi.fn();
-vi.mock("@shared/newsletter", () => ({
-  renderNewsletter: (...args: unknown[]) => mockRenderNewsletter(...args),
-}));
+vi.mock("@shared/newsletter", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@shared/newsletter")>();
+  return {
+    ...actual,
+    renderNewsletter: (...args: unknown[]) => mockRenderNewsletter(...args),
+  };
+});
 
 // Mock email sender
 const mockSendEmail = vi.fn();
@@ -236,7 +242,7 @@ describe("sendNewsletter", () => {
       remaining: 2,
       resetAt: Date.now() + 300000,
     });
-    mockRepo.getNewBookmarks.mockResolvedValue(MOCK_BOOKMARKS);
+    mockRepo.getNewsletterBookmarks.mockResolvedValue(MOCK_BOOKMARKS);
     mockRenderNewsletter.mockReturnValue({
       subject: "Your X Bookmarks — March 3, 2026",
       html: "<html>newsletter</html>",
@@ -260,10 +266,10 @@ describe("sendNewsletter", () => {
     );
 
     // Verify bookmarks fetched
-    expect(mockRepo.getNewBookmarks).toHaveBeenCalled();
+    expect(mockRepo.getNewsletterBookmarks).toHaveBeenCalled();
 
     // Verify newsletter rendered with bookmarks
-    expect(mockRenderNewsletter).toHaveBeenCalledWith(MOCK_BOOKMARKS);
+    expect(mockRenderNewsletter).toHaveBeenCalledWith(MOCK_BOOKMARKS, { includeImages: undefined });
 
     // Verify email sent with correct args
     expect(mockSendEmail).toHaveBeenCalledWith(
@@ -290,7 +296,7 @@ describe("sendNewsletter", () => {
   });
 
   it("returns early with message when no new bookmarks exist", async () => {
-    mockRepo.getNewBookmarks.mockResolvedValue([]);
+    mockRepo.getNewsletterBookmarks.mockResolvedValue([]);
 
     const result = await sendNewsletter();
 
@@ -351,7 +357,7 @@ describe("sendNewsletter", () => {
     });
 
     // Should not proceed past rate limit
-    expect(mockRepo.getNewBookmarks).not.toHaveBeenCalled();
+    expect(mockRepo.getNewsletterBookmarks).not.toHaveBeenCalled();
     expect(mockRenderNewsletter).not.toHaveBeenCalled();
     expect(mockSendEmail).not.toHaveBeenCalled();
   });
@@ -396,7 +402,7 @@ describe("sendNewsletter", () => {
       { tweet_id: "bbb", text: "t2", author_name: "B", author_username: "b", created_at: null, folder_name: null },
       { tweet_id: "ccc", text: "t3", author_name: "C", author_username: "c", created_at: null, folder_name: null },
     ];
-    mockRepo.getNewBookmarks.mockResolvedValue(threeBookmarks);
+    mockRepo.getNewsletterBookmarks.mockResolvedValue(threeBookmarks);
 
     await sendNewsletter();
 
@@ -430,7 +436,7 @@ describe("previewNewsletter", () => {
       remaining: 59,
       resetAt: Date.now() + 60000,
     });
-    mockRepo.getNewBookmarks.mockResolvedValue(MOCK_BOOKMARKS);
+    mockRepo.getNewsletterBookmarks.mockResolvedValue(MOCK_BOOKMARKS);
     mockRenderNewsletter.mockReturnValue({
       subject: "Your X Bookmarks — March 6, 2026",
       html: "<html>preview</html>",
@@ -450,7 +456,7 @@ describe("previewNewsletter", () => {
       remaining: 59,
       resetAt: Date.now() + 60000,
     });
-    mockRepo.getNewBookmarks.mockResolvedValue([]);
+    mockRepo.getNewsletterBookmarks.mockResolvedValue([]);
 
     const result = await previewNewsletter();
 

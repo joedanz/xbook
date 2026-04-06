@@ -21,24 +21,28 @@ vi.mock("@/lib/api-auth", () => ({
 }));
 
 // Mock db module
-const mockGetNewBookmarks = vi.fn();
+const mockGetNewsletterBookmarks = vi.fn();
 const mockMarkNewslettered = vi.fn();
 const mockLogNewsletter = vi.fn();
 vi.mock("@/lib/db", () => ({
   getRepository: vi.fn(() => ({
-    getNewBookmarks: mockGetNewBookmarks,
+    getNewsletterBookmarks: mockGetNewsletterBookmarks,
     markNewslettered: mockMarkNewslettered,
     logNewsletter: mockLogNewsletter,
   })),
 }));
 
-// Mock newsletter renderer
-vi.mock("@shared/newsletter", () => ({
-  renderNewsletter: vi.fn(() => ({
-    subject: "Your X Bookmarks — March 6, 2026",
-    html: "<html>newsletter</html>",
-  })),
-}));
+// Mock newsletter renderer — use importOriginal to preserve parseDateRange, validateDateRange, MAX_BOOKMARKS
+vi.mock("@shared/newsletter", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@shared/newsletter")>();
+  return {
+    ...actual,
+    renderNewsletter: vi.fn(() => ({
+      subject: "Your X Bookmarks — March 6, 2026",
+      html: "<html>newsletter</html>",
+    })),
+  };
+});
 
 // Mock email sender
 const mockSendEmail = vi.fn();
@@ -126,7 +130,7 @@ describe("POST /api/v1/newsletter", () => {
   it("returns success with count 0 when no new bookmarks", async () => {
     mockedCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 99, resetAt: 0 });
     mockedAuth.mockResolvedValueOnce({ userId: "local" });
-    mockGetNewBookmarks.mockResolvedValueOnce([]);
+    mockGetNewsletterBookmarks.mockResolvedValueOnce([]);
 
     const res = await POST(makeRequest());
     expect(res.status).toBe(200);
@@ -138,7 +142,7 @@ describe("POST /api/v1/newsletter", () => {
   it("returns preview HTML on dry_run", async () => {
     mockedCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 99, resetAt: 0 });
     mockedAuth.mockResolvedValueOnce({ userId: "local" });
-    mockGetNewBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
+    mockGetNewsletterBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
 
     const res = await POST(makeRequest({ dry_run: true }));
     expect(res.status).toBe(200);
@@ -153,7 +157,7 @@ describe("POST /api/v1/newsletter", () => {
   it("sends email and marks bookmarks on success", async () => {
     mockedCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 99, resetAt: 0 });
     mockedAuth.mockResolvedValueOnce({ userId: "local" });
-    mockGetNewBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
+    mockGetNewsletterBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
     mockSendEmail.mockResolvedValueOnce(undefined);
 
     const res = await POST(makeRequest());
@@ -170,7 +174,7 @@ describe("POST /api/v1/newsletter", () => {
     delete process.env.RESEND_API_KEY;
     mockedCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 99, resetAt: 0 });
     mockedAuth.mockResolvedValueOnce({ userId: "local" });
-    mockGetNewBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
+    mockGetNewsletterBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
 
     const res = await POST(makeRequest());
     expect(res.status).toBe(500);
@@ -181,7 +185,7 @@ describe("POST /api/v1/newsletter", () => {
   it("returns 502 when email send fails", async () => {
     mockedCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 99, resetAt: 0 });
     mockedAuth.mockResolvedValueOnce({ userId: "local" });
-    mockGetNewBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
+    mockGetNewsletterBookmarks.mockResolvedValueOnce(MOCK_BOOKMARKS);
     mockSendEmail.mockRejectedValueOnce(new Error("Email service down"));
 
     const res = await POST(makeRequest());

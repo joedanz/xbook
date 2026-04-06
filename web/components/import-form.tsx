@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { parseImportFile, type ImportResult } from "@shared/import-parser";
 import { importBookmarks } from "@/lib/actions";
+import { trackImportBookmarks } from "@/lib/analytics";
 
 const BATCH_SIZE = 100;
 
@@ -112,6 +113,7 @@ export function ImportForm() {
     setTotals(result);
 
     if (result.imported > 0) {
+      trackImportBookmarks();
       toast.success(`Imported ${result.imported} new bookmarks`);
     } else if (result.skipped > 0) {
       toast.info(`All ${result.skipped} bookmarks already exist`);

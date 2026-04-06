@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { trackSearch } from "@/lib/analytics";
 
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
@@ -31,6 +32,7 @@ export function SearchDialog() {
       e.preventDefault();
       const q = query.trim();
       if (q) {
+        trackSearch();
         router.push(`/bookmarks?q=${encodeURIComponent(q)}`);
         setOpen(false);
         setQuery("");

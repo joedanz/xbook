@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ConnectButton } from "@/components/connect-button";
 
 export function ConnectionStatus() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const isCloud = !!process.env.NEXT_PUBLIC_APP_URL;
 
   useEffect(() => {
     fetch("/api/connect-x/status")
@@ -21,19 +20,14 @@ export function ConnectionStatus() {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       <Badge variant={authenticated ? "default" : "secondary"}>
         {authenticated ? "Connected" : "Not connected"}
       </Badge>
       {!authenticated && (
-        isCloud ? (
-          <ConnectButton />
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Use <code className="font-mono text-xs">xbook login</code> to connect
-            your X account.
-          </p>
-        )
+        <Button asChild size="sm">
+          <a href="/api/connect-x">Connect X Account</a>
+        </Button>
       )}
     </div>
   );
