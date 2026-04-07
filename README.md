@@ -1,7 +1,7 @@
 # xbook
 
 [![FSL-1.1-MIT](https://img.shields.io/badge/license-FSL--1.1--MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-329_passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-661_passing-brightgreen.svg)]()
 [![Node 20+](https://img.shields.io/badge/node-20%2B-green.svg)]()
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)]()
 

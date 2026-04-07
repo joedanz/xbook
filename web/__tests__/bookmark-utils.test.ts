@@ -26,6 +26,12 @@ function makeBookmark(
     starred: false,
     need_to_read: false,
     hidden: false,
+    deleted: false,
+    like_count: null,
+    retweet_count: null,
+    reply_count: null,
+    quote_count: null,
+    impression_count: null,
     ...overrides,
   };
 }

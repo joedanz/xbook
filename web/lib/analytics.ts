@@ -13,6 +13,3 @@ export function trackMoveBookmark() {}
 export function trackImportBookmarks() {}
 export function trackSendNewsletter() {}
 export function trackUpdateNewsletterSettings() {}
-export function trackSubscribe(_cents: number) {}
-export function trackUpgradePlan(_cents: number) {}
-export function trackCancelSubscription() {}

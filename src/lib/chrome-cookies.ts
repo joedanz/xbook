@@ -125,7 +125,14 @@ export async function extractChromeCookies(
     const db = new Database(tempCookiesPath, { readonly: true });
 
     let rows: { name: string; encrypted_value: Buffer; host_key: string }[];
+    let dbVersion = 0;
     try {
+      // Chrome 130+ (DB version >= 24) prepends SHA256(host_key) to plaintext
+      const metaRow = db.prepare(
+        `SELECT value FROM meta WHERE key = 'version'`
+      ).get() as { value: number } | undefined;
+      dbVersion = metaRow?.value ?? 0;
+
       const stmt = db.prepare(
         `SELECT name, encrypted_value, host_key FROM cookies
          WHERE host_key IN ('.x.com', '.twitter.com')
@@ -170,7 +177,8 @@ export async function extractChromeCookies(
             Buffer.isBuffer(row.encrypted_value)
               ? row.encrypted_value
               : Buffer.from(row.encrypted_value),
-            derivedKey
+            derivedKey,
+            dbVersion
           );
         } catch {
           // Skip cookies with unsupported encryption (e.g. v20 on newer Chrome)
@@ -212,8 +220,12 @@ export async function extractChromeCookies(
 /**
  * Decrypts a single Chrome cookie encrypted_value buffer using the derived key.
  * Handles v10 (AES-128-CBC) prefix; throws on unsupported versions (e.g. v20).
+ *
+ * Chrome 130+ (DB version >= 24) prepends SHA256(host_key) (32 bytes) to the
+ * plaintext before encryption as a domain-binding measure. We strip it after
+ * decryption so the caller gets the raw cookie value.
  */
-function decryptCookieValue(encryptedValue: Buffer, derivedKey: Buffer): string {
+function decryptCookieValue(encryptedValue: Buffer, derivedKey: Buffer, dbVersion: number): string {
   if (encryptedValue.length <= 3) return "";
 
   const prefix = encryptedValue.subarray(0, 3).toString("ascii");
@@ -225,6 +237,12 @@ function decryptCookieValue(encryptedValue: Buffer, derivedKey: Buffer): string 
     decipher.setAutoPadding(true);
     let decrypted = decipher.update(encrypted);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+    // Chrome 130+ prepends SHA256(host_key) to the plaintext — strip it
+    if (dbVersion >= 24 && decrypted.length > 32) {
+      decrypted = decrypted.subarray(32);
+    }
+
     return decrypted.toString("utf-8");
   }
 

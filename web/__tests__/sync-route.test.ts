@@ -103,6 +103,7 @@ const SYNC_RESULT = {
   articleImagesFound: 5,
   pages: 1,
   paginationLog: [],
+  earlyTerminated: false,
 };
 
 const MOCK_REPO = {};
@@ -233,10 +234,11 @@ describe("POST /api/v1/sync — local mode", () => {
       fetched: SYNC_RESULT.fetched,
       newCount: SYNC_RESULT.newCount,
       foldersFound: SYNC_RESULT.foldersFound,
+      earlyTerminated: SYNC_RESULT.earlyTerminated,
     });
 
     expect(mockLoadCliTokens).toHaveBeenCalled();
-    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, VALID_TOKENS.accessToken);
+    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, VALID_TOKENS.accessToken, undefined, undefined, { full: false });
   });
 
   it("returns 401 when no CLI tokens are found on disk", async () => {
@@ -273,7 +275,7 @@ describe("POST /api/v1/sync — local mode", () => {
     );
 
     // Sync must use the fresh access token, not the expired one
-    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, refreshedTokens.accessToken);
+    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, refreshedTokens.accessToken, undefined, undefined, { full: false });
 
     // Refreshed tokens must be persisted back to disk
     expect(mockSaveCliTokens).toHaveBeenCalledWith(refreshedTokens);
@@ -286,7 +288,7 @@ describe("POST /api/v1/sync — local mode", () => {
 
     expect(mockRefreshXTokenForWeb).not.toHaveBeenCalled();
     expect(mockSaveCliTokens).not.toHaveBeenCalled();
-    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, VALID_TOKENS.accessToken);
+    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, VALID_TOKENS.accessToken, undefined, undefined, { full: false });
   });
 
   it("skips refresh when X_CLIENT_ID or X_CLIENT_SECRET are not set", async () => {
@@ -298,7 +300,7 @@ describe("POST /api/v1/sync — local mode", () => {
 
     expect(mockRefreshXTokenForWeb).not.toHaveBeenCalled();
     // Falls through to sync with the original (expired) access token
-    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, EXPIRED_TOKENS.accessToken);
+    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, EXPIRED_TOKENS.accessToken, undefined, undefined, { full: false });
   });
 
   it("returns 401 when token refresh throws", async () => {
@@ -360,6 +362,7 @@ describe("POST /api/v1/sync — cloud mode", () => {
       fetched: SYNC_RESULT.fetched,
       newCount: SYNC_RESULT.newCount,
       foldersFound: SYNC_RESULT.foldersFound,
+      earlyTerminated: SYNC_RESULT.earlyTerminated,
     });
 
     // refreshCloudTokens is called with the DB row, the userId, and the sql tag
@@ -370,7 +373,7 @@ describe("POST /api/v1/sync — cloud mode", () => {
     );
 
     // syncBookmarks receives the token returned by refreshCloudTokens
-    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, "cloud-access-token-refreshed");
+    expect(mockSyncBookmarks).toHaveBeenCalledWith(MOCK_REPO, "cloud-access-token-refreshed", undefined, undefined, { full: false });
   });
 
   it("returns 401 when the user_settings row has no x_access_token", async () => {
