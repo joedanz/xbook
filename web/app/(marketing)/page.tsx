@@ -31,8 +31,8 @@ export const metadata: Metadata = {
 const features = [
   {
     icon: Bookmark,
-    title: "Auto Sync",
-    description: "Automatically sync your X bookmarks. Never lose a saved post again.",
+    title: "Chrome Sync",
+    description: "Sync straight from Chrome — no developer account needed. Or use the X API.",
   },
   {
     icon: Search,
@@ -62,9 +62,9 @@ const features = [
 ];
 
 const steps = [
-  { step: "1", title: "Connect X", description: "Authorize xbook to access your X bookmarks." },
-  { step: "2", title: "Auto Sync", description: "Your bookmarks are synced and organized automatically." },
-  { step: "3", title: "Digest", description: "Receive a weekly newsletter of your latest saves." },
+  { step: "1", title: "Sync", description: "Pull your bookmarks from Chrome with one command. Full history, no API key." },
+  { step: "2", title: "Search", description: "Full-text search across every bookmark you've ever saved." },
+  { step: "3", title: "Digest", description: "Get a weekly email with what you saved — your bookmarks come to you." },
 ];
 
 export default function LandingPage() {
@@ -80,8 +80,8 @@ export default function LandingPage() {
             Your X bookmarks, organized.
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Sync, search, tag, and organize your X bookmarks. Get a newsletter
-            digest of your saved content. Your data, your machine.
+            Sync your X bookmarks straight from Chrome — full history, no API key needed.
+            Search everything, get a weekly digest. Your data, your machine.
           </p>
           <div className="mt-8 flex items-center justify-center gap-4 flex-wrap">
             <Button size="lg" asChild>
@@ -181,11 +181,11 @@ export default function LandingPage() {
             <CardContent>
               <ul className="space-y-2 text-sm">
                 {[
-                  "Fair Source (FSL-1.1-MIT)",
+                  "Chrome sync — no API key needed",
+                  "Full history + engagement stats",
                   "SQLite — zero dependencies",
-                  "Docker one-liner",
+                  "Fair Source (FSL-1.1-MIT)",
                   "Full API access",
-                  "Community support",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-primary" aria-hidden="true" />
