@@ -17,14 +17,43 @@ xbook pulls your bookmarks into a local database you can search, and emails you 
 
 ## Features
 
-- **Sync** — Pull bookmarks from X automatically, including folder assignments
-- **Import** — Load bookmarks from JSON or CSV (for full history beyond the API's ~100 limit)
-- **Browse** — Search, filter by folder/author/tags, add notes and tags per bookmark
+- **Chrome Sync** — Pull bookmarks straight from Chrome. Full history, no developer account needed (macOS)
+- **X API Sync** — Or use the official X API. Works on all platforms (requires [X Developer account](https://developer.x.com))
+- **Import** — Load bookmarks from JSON or CSV
+- **Full-text Search** — Search across every bookmark you've ever saved
+- **Browse** — Filter by folder, author, or tags. Add notes and tags per bookmark
 - **Newsletter** — Weekly email digest of new bookmarks via Resend
 - **Scheduled** — Run sync + newsletter on a cron for hands-off operation
 - **Self-hosted** — Single Docker container, SQLite, your data stays on your machine
 
-## Quick Start (Docker)
+## Quick Start
+
+### Option A: Chrome Sync (recommended, macOS)
+
+No API keys needed. Syncs your full bookmark history directly from Chrome.
+
+```bash
+git clone https://github.com/joedanz/xbook.git
+cd xbook
+npm install
+cd web && npm install && cd ..
+cp .env.example .env.local
+cd web && npm run dev    # Start the web UI
+```
+
+In a separate terminal:
+
+```bash
+xbook sync --chrome      # Pulls all your bookmarks from Chrome
+```
+
+Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard) to browse your bookmarks.
+
+> **Note:** Chrome sync requires macOS and Full Disk Access for your terminal (System Settings → Privacy & Security → Full Disk Access). You must be logged into x.com in Chrome.
+
+### Option B: Docker + X API
+
+If you're not on macOS, or prefer OAuth-based sync:
 
 ```bash
 git clone https://github.com/joedanz/xbook.git
@@ -36,7 +65,7 @@ docker compose up -d
 
 Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard) and click **"Connect X Account"** to link your X account.
 
-> You'll need an [X Developer account](https://developer.x.com) with OAuth 2.0 credentials. See the [X Developer setup guide](docs/x-developer-setup.md) for a walkthrough.
+> You'll need an [X Developer account](https://developer.x.com) with OAuth 2.0 credentials. See the [X Developer setup guide](docs/x-developer-setup.md) for a walkthrough. The API is limited to your ~100 most recent bookmarks — use [import](docs/import-formats.md) or Chrome sync for full history.
 
 <details>
 <summary><strong>Self-Hosting Details</strong></summary>
@@ -45,7 +74,7 @@ xbook runs as a single Docker container with SQLite for storage. Data is persist
 
 **Requirements:**
 - Docker and Docker Compose
-- X Developer account with OAuth 2.0 credentials
+- X Developer account with OAuth 2.0 credentials (for API sync), or macOS with Chrome (for Chrome sync)
 
 The SQLite database is stored in a Docker volume (`xbook-data`) and persists across restarts.
 
@@ -68,8 +97,9 @@ Your data is safe in the `xbook-data` Docker volume across upgrades.
 
 **Prerequisites:**
 - Node.js 20+
-- [X Developer account](https://developer.x.com) with OAuth 2.0 (PKCE)
 - [Resend](https://resend.com) account (optional, for newsletters)
+- For Chrome sync: macOS + Chrome logged into x.com
+- For API sync: [X Developer account](https://developer.x.com) with OAuth 2.0 (PKCE)
 
 **Setup:**
 
@@ -78,13 +108,13 @@ git clone https://github.com/joedanz/xbook.git && cd xbook
 npm install
 cd web && npm install && cd ..
 cp .env.example .env.local
-# Edit .env.local with your credentials
+# Edit .env.local with your credentials (optional — not needed for Chrome sync)
 ```
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `X_CLIENT_ID` | Yes | OAuth 2.0 Client ID from X Developer Portal |
-| `X_CLIENT_SECRET` | Yes | OAuth 2.0 Client Secret |
+| `X_CLIENT_ID` | For API sync | OAuth 2.0 Client ID from X Developer Portal |
+| `X_CLIENT_SECRET` | For API sync | OAuth 2.0 Client Secret |
 | `RESEND_API_KEY` | No | For email newsletter digest |
 | `NEWSLETTER_TO` | No | Newsletter recipient email |
 
@@ -92,8 +122,8 @@ cp .env.example .env.local
 
 ```bash
 cd web && npm run dev    # Web UI at http://localhost:3000
+xbook sync --chrome      # Sync from Chrome (or xbook sync --api for API)
 npm test                 # Run tests
-npm run build            # Build CLI
 ```
 
 **Upgrading:**

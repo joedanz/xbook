@@ -66,10 +66,8 @@ export function EmptyState() {
                 Or use the CLI:
               </p>
               <p>
-                <span className="text-muted-foreground">$</span> xbook login
-              </p>
-              <p>
                 <span className="text-muted-foreground">$</span> xbook sync
+                --chrome
               </p>
             </div>
           )}
