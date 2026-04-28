@@ -68,7 +68,7 @@ jobs:
 
       - name: Scan Docker image with Trivy
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: xbook:ci-${{ github.sha }}
           format: table
